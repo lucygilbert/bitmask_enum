@@ -1,9 +1,13 @@
 #!/bin/sh
 
-valid=0
 
 rake spec
-valid=$(( $valid == 0 ? $? : $valid ))
+
+valid=$?
+
+if [[ $valid -ne 0 ]]; then
+  exit $valid
+fi
 
 for file in $(git diff-index --name-only --diff-filter AM --cached HEAD); do
   if (echo $file | egrep -q '(\.rb|Gemfile|Rakefile|\.gemspec)$') then
