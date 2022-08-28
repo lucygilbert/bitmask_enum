@@ -13,8 +13,9 @@ module BitmaskEnum
     end
 
     def construct!
+      flag_prefix, flag_suffix = fixes_from_options
       @flags.each_with_index do |flag, flag_index|
-        per_flag_methods("#{@options[:flag_prefix]}#{flag}#{@options[:flag_suffix]}", flag_index)
+        per_flag_methods("#{flag_prefix}#{flag}#{flag_suffix}", flag_index)
       end
 
       flag_settings_hash_method
@@ -24,6 +25,13 @@ module BitmaskEnum
     end
 
     private
+
+    def fixes_from_options
+      prefix = @options[:flag_prefix] ? "#{@options[:flag_prefix]}_" : ''
+      suffix = @options[:flag_suffix] ? "_#{@options[:flag_suffix]}" : ''
+
+      [prefix, suffix]
+    end
 
     def per_flag_methods(flag_label, flag_index)
       flag_check_method(flag_label, flag_index)
@@ -69,7 +77,8 @@ module BitmaskEnum
     end
 
     def class_flag_scope(scope_name, setting, flag_index)
-      values_for_bitmask = values_for_bitmask_flag_index(setting, flag_index)
+      comparator = setting == :on ? :> : :==
+      values_for_bitmask = (0...(1 << @flags.size)).select { |x| (x & (1 << flag_index)).send(comparator, 0) }
 
       @conflict_checker.check_class_method!(scope_name)
 
@@ -112,11 +121,6 @@ module BitmaskEnum
           #{@flags}             #   [:flag]
         end                     # end
       ), __FILE__, __LINE__ - 4
-    end
-
-    def values_for_bitmask_flag_index(setting, flag_index)
-      comparator = setting == :on ? :> : :==
-      (0...(1 << @flags.size)).select { |x| (x & (1 << flag_index)).send(comparator, 0) }
     end
   end
 end

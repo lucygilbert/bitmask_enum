@@ -10,24 +10,24 @@ module BitmaskEnum
     flag_suffix: nil
   }.freeze
 
-  def bitmask_enum(definition, options = {})
-    validation_error = validate_definition(definition)
+  def bitmask_enum(params)
+    validation_error = validate_params(params)
     raise BitmaskEnumInvalidError, validation_error if validation_error.present?
 
-    attribute, flags = definition.first
-    merged_options = options.symbolize_keys.merge(DEFAULT_BITMASK_ENUM_OPTIONS)
+    attribute, flags = params.shift
+    options = params
+    merged_options = DEFAULT_BITMASK_ENUM_OPTIONS.merge(options.symbolize_keys)
 
     Attribute.new(self, attribute, flags, merged_options, defined_bitmask_enum_methods).construct!
   end
 
   private
 
-  def validate_definition(definition)
-    return 'must be a hash' unless definition.is_a?(Hash)
+  def validate_params(params)
+    return 'must be a hash' unless params.is_a?(Hash)
+    return 'attribute must be a symbol or string and cannot be empty' unless text?(params.first.first)
 
-    return 'must have one key' if definition.keys.size != 1
-
-    flags = definition.first[1]
+    flags = params.first[1]
     return if flags.is_a?(Array) && flags.all? { |f| text?(f) }
 
     'must provide a symbol or string array of flags'

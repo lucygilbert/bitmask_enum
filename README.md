@@ -26,32 +26,29 @@ Or install it yourself as:
 
 ## Usage
 
-In the model, the bitmask enum is added in a similar way to enums. Given an integer attribute called `attribute` and flags of `flag_one` and `flag_two`, the following line would be added:
+In the model, the bitmask enum is added in a similar way to enums. Given an integer attribute called `attribs`, flags of `flag` and `flag2`, adding the `flag_prefix` option with the value `type`, the following line would be used:
 
 ```ruby
-bitmask_enum attribute: [:flag_one, :flag_two]
+bitmask_enum attribs: [:flag, :flag2], flag_prefix: 'type'
 ```
 
 The `bitmask_enum` class method is used to add the bitmask enum, which then goes on to add numerous helper methods to the model:
 
 ### `bitmask_enum`
 
-`bitmask_enum definition, options`
+`bitmask_enum params`
 
-#### definition
-
-**Type:** Hash
-
-This hash should have one key, the name of the integer attribute to be modeled as a bitmask enum. The value of that key should be an array of symbols or strings representing the flags that will be part of the bitmask.
-
-
-#### options
+#### params
 
 **Type:** Hash
 
-A hash of options for the enum. The current accepted keys are:
+The first key of this hash should be the name of the integer attribute to be modeled as a bitmask enum. The value of that key should be an array of symbols or strings representing the flags that will be part of the bitmask.
+
+Any following keys are optional and should define options for the enum. The current accepted keys are:
 - `flag_prefix` - A symbol or string that will prefix all the created method names for individual flags
+  - The gem will prepend the provided value to the flag with an underscore, e.g. `pre` would become `pre_flag`
 - `flag_suffix` - A symbol or string that will suffix all the created method names for individual flags
+  - The gem will append the provided value to the flag with an underscore, e.g. `post` would become `flag_post`
 
 ---
 

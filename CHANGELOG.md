@@ -13,3 +13,10 @@ Pre-release.
 
 Refactor of underlying logic. 
 Enforce symbols in method output.
+
+## 0.3.0 : 2022-08-28
+
+Pre-release.
+
+Refactor logic and tests.
+Switch bitmask_enum params to a single hash with multiple keys.
