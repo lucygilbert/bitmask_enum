@@ -103,7 +103,7 @@ The method disables the the flag is it is enabled, otherwise it takes no action.
 
 This method will be created once on the instance.
 
-The method returns a hash with the flags as keys and their current settings as values. The keys can be strings or symbols depending on which you used for the enum definition.
+The method returns a hash with the flags as keys and their current settings as values. The keys will be symbols.
 
 **Return value:** `hash` - hash with flags as keys and their current settings as values. E.g. `{ flag_one: true, flag_two: false }`
 
@@ -113,7 +113,7 @@ The method returns a hash with the flags as keys and their current settings as v
 
 This method will be created once on the instance.
 
-The method returns an array of all enabled flags on the instance. The items can be strings or symbols depending on which you used for the enum definition.
+The method returns an array of all enabled flags on the instance. The items will be symbols.
 
 **Return value:** `array` - array of enabled flags. E.g. `[:flag_one, :flag_two]`
 
