@@ -1,0 +1,8 @@
+#!/bin/sh
+
+bundle install
+if cp -f pre-commit .git/hooks/; then
+  echo '\033[0;32mPre-commit copied to .git/hooks!\nSUCCESS.\033[0;0m'
+else
+  echo '\033[0;31mPre-commit copy failed! Ensure the pre-commit is enabled before continuing.\nERROR!\033[0;0m'
+fi

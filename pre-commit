@@ -1,0 +1,15 @@
+#!/bin/sh
+
+valid=0
+
+rake spec
+valid=$(( $valid == 0 ? $? : $valid ))
+
+for file in $(git diff-index --name-only --diff-filter AM --cached HEAD); do
+  if (echo $file | egrep -q '(\.rb|Gemfile|Rakefile|\.gemspec)$') then
+    bundle exec rubocop --force-exclusion $file
+    valid=$(( $valid == 0 ? $? : $valid ))
+  fi
+done
+
+exit $valid

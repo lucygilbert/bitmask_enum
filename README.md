@@ -155,6 +155,14 @@ The method returns an array of all the defined flags. The items can be strings o
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/lucygilbert/bitmask_enum. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
+1. Fork the repo.
+2. Run `bin/setup` to install the bundle and set up the pre-commit hook.
+  - If the output ends with `SUCCESS.`, the pre-commit hook has been applied correctly.
+  - If the output ends with `ERROR!`, applying the pre-commit hook has failed. Please check the error and install manually.
+3. Create a branch, prefixed with `feature/` if this addition is a new feature, or `bugfix/` if the addition is a bug fix.
+4. Add your code with ample testing and ensure that tests and linting pass for your commit.
+5. Push the branch to your fork and raise a PR against the main repo.
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
