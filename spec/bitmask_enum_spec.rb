@@ -6,7 +6,7 @@ RSpec.describe BitmaskEnum do
   end
 
   it 'has a version number' do
-    expect(BitmaskEnum::VERSION).to eq '0.1.0'
+    expect(BitmaskEnum::VERSION).to eq '0.1.1'
   end
 
   context 'when the definition is valid' do

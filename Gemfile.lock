@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bitmask_enum (0.1.0)
+    bitmask_enum (0.1.1)
       activerecord (>= 4.2)
 
 GEM
@@ -74,9 +74,9 @@ DEPENDENCIES
   bundler (~> 1.17)
   rake (~> 10.0)
   rspec (~> 3.0)
-  rubocop
-  rubocop-rspec
-  sqlite3
+  rubocop (~> 1.35)
+  rubocop-rspec (~> 2.12)
+  sqlite3 (~> 1.4)
 
 BUNDLED WITH
    1.17.2
