@@ -345,4 +345,76 @@ RSpec.describe BitmaskEnum::Attribute do
       expect(TestModel.attribs).to eq FLAGS
     end
   end
+
+  context 'when writing to the attribute' do
+    shared_examples 'writing to the attribute' do
+      context 'when using an integer as the attribute value' do
+        let(:value) { 5 }
+
+        it 'correctly sets the attribute' do
+          expect(TestModel.first.attribs).to contain_exactly(:flag, :flag3)
+        end
+      end
+
+      context 'when using an array of flags as the attribute value' do
+        let(:value) { %i[flag flag3] }
+
+        it 'correctly sets the attribute' do
+          expect(TestModel.first.attribs).to contain_exactly(:flag, :flag3)
+        end
+      end
+
+      context 'when using a flag as the attribute value' do
+        let(:value) { :flag3 }
+
+        it 'correctly sets the attribute' do
+          expect(TestModel.first.attribs).to contain_exactly(:flag3)
+        end
+      end
+
+      context 'when using nil as the attribute value' do
+        let(:value) { nil }
+
+        it 'correctly sets the attribute' do
+          expect(TestModel.first.attribs).to eq []
+        end
+      end
+    end
+
+    describe '.create' do
+      before do
+        TestModel.create(attribs: value)
+      end
+
+      it_behaves_like 'writing to the attribute'
+    end
+
+    describe '.create!' do
+      before do
+        TestModel.create!(attribs: value)
+      end
+
+      it_behaves_like 'writing to the attribute'
+    end
+
+    describe '.update' do
+      let(:instance) { TestModel.create!(attribs: [:flag2]) }
+
+      before do
+        instance.update(attribs: value)
+      end
+
+      it_behaves_like 'writing to the attribute'
+    end
+
+    describe '.update!' do
+      let(:instance) { TestModel.create!(attribs: [:flag2]) }
+
+      before do
+        instance.update!(attribs: value)
+      end
+
+      it_behaves_like 'writing to the attribute'
+    end
+  end
 end

@@ -3,6 +3,7 @@
 require 'bitmask_enum/conflict_checker'
 require 'bitmask_enum/options'
 require 'bitmask_enum/nil_handler'
+require 'bitmask_enum/eval_scripts'
 
 module BitmaskEnum
   class Attribute
@@ -21,7 +22,8 @@ module BitmaskEnum
       end
 
       flag_settings_hash_method
-      enabled_flags_array_method
+      flag_getter_method
+      flag_setter_method
 
       class_flag_values_method
     end
@@ -66,11 +68,7 @@ module BitmaskEnum
     def flag_method(method_name, method_code)
       @conflict_checker.check_instance_method!(method_name)
 
-      @model.class_eval %(
-        def #{method_name}  # def flag!
-          #{method_code}    #   update!('attribs' => self['attribs'] ^ 1)
-        end                 # end
-      ), __FILE__, __LINE__ - 4
+      @model.class_eval EvalScripts.flag_method(method_name, method_code), __FILE__, __LINE__
     end
 
     def class_flag_enabled_scope(flag_label, flag_index)
@@ -89,11 +87,7 @@ module BitmaskEnum
 
       @conflict_checker.check_class_method!(scope_name)
 
-      @model.class_eval %(
-        scope :#{scope_name}, -> do                       # scope :flag_disabled, -> do
-          where('#{@attribute}' => #{values_for_bitmask}) #   where('attribs' => [0, 2, 4])
-        end                                               # end
-      ), __FILE__, __LINE__ - 4
+      @model.class_eval EvalScripts.flag_scope(scope_name, @attribute, values_for_bitmask), __FILE__, __LINE__
     end
 
     def flag_settings_hash_method
@@ -104,34 +98,30 @@ module BitmaskEnum
       flag_hash_contents = @flags.each_with_index.map do |flag, flag_index|
         "#{flag}: (#{@nil_handler.in_attribute_eval(@attribute)} & #{1 << flag_index}).positive?"
       end.join(', ')
-      @model.class_eval %(
-        def #{method_name}          # def attribs_settings
-          { #{flag_hash_contents} } #   { flag: (self['attribs'] & 1).positive? }
-        end                         # end
-      ), __FILE__, __LINE__ - 4
+      @model.class_eval EvalScripts.flag_settings(method_name, flag_hash_contents), __FILE__, __LINE__
     end
 
-    def enabled_flags_array_method
+    def flag_getter_method
       @conflict_checker.check_instance_method!(@attribute)
 
       flag_array_contents = @flags.each_with_index.map do |flag, flag_index|
         "(#{@nil_handler.in_attribute_eval(@attribute)} & #{1 << flag_index}).positive? ? :#{flag} : nil"
       end.join(', ')
-      @model.class_eval %(
-        def #{@attribute}                   # def attribs
-          [#{flag_array_contents}].compact  #   [:flag]
-        end                                 # end
-      ), __FILE__, __LINE__ - 4
+      @model.class_eval EvalScripts.flag_getter(@attribute, flag_array_contents), __FILE__, __LINE__
+    end
+
+    def flag_setter_method
+      method_name = "#{@attribute}="
+
+      @conflict_checker.check_instance_method!(method_name)
+
+      @model.class_eval EvalScripts.flag_setter(method_name, @attribute), __FILE__, __LINE__
     end
 
     def class_flag_values_method
       @conflict_checker.check_class_method!(@attribute)
 
-      @model.class_eval %(
-        def self.#{@attribute}  # def self.attribs
-          #{@flags}             #   [:flag]
-        end                     # end
-      ), __FILE__, __LINE__ - 4
+      @model.class_eval EvalScripts.class_flag_values(@attribute, @flags), __FILE__, __LINE__
     end
   end
 end
