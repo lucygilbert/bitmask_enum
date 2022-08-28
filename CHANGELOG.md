@@ -20,3 +20,10 @@ Pre-release.
 
 Refactor logic and tests.
 Switch bitmask_enum params to a single hash with multiple keys.
+
+## 0.4.0 : 2022-08-28
+
+Pre-release.
+
+Add nil handling.
+Refactor options and add testing for them.

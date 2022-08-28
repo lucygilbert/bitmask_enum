@@ -7,7 +7,8 @@ require 'bitmask_enum/errors'
 module BitmaskEnum
   DEFAULT_BITMASK_ENUM_OPTIONS = {
     flag_prefix: nil,
-    flag_suffix: nil
+    flag_suffix: nil,
+    nil_handling: :include
   }.freeze
 
   def bitmask_enum(params)

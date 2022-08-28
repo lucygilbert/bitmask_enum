@@ -49,6 +49,9 @@ Any following keys are optional and should define options for the enum. The curr
   - The gem will prepend the provided value to the flag with an underscore, e.g. `pre` would become `pre_flag`
 - `flag_suffix` - A symbol or string that will suffix all the created method names for individual flags
   - The gem will append the provided value to the flag with an underscore, e.g. `post` would become `flag_post`
+- `nil_handling` - A symbol or string that signifies which behaviour to use when handling nil attribute values
+  - The default value, used if the option is not supplied or if an unrecognized option is supplied, is :include. This includes nil attribute rows as if they were 0.
+  - There are currently no other options but more are planned.
 
 ---
 

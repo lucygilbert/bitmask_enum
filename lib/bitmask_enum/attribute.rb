@@ -1,21 +1,23 @@
 # frozen_string_literal: true
 
 require 'bitmask_enum/conflict_checker'
+require 'bitmask_enum/options'
+require 'bitmask_enum/nil_handler'
 
 module BitmaskEnum
   class Attribute
     def initialize(model, attribute, flags, options, defined_enum_methods)
       @attribute = attribute
       @flags = flags
-      @options = options
+      @options = Options.new(options)
+      @nil_handler = NilHandler.new(@options.nil_handling)
       @model = model
       @conflict_checker = ConflictChecker.new(model, attribute, defined_enum_methods)
     end
 
     def construct!
-      flag_prefix, flag_suffix = fixes_from_options
       @flags.each_with_index do |flag, flag_index|
-        per_flag_methods("#{flag_prefix}#{flag}#{flag_suffix}", flag_index)
+        per_flag_methods("#{@options.flag_prefix}#{flag}#{@options.flag_suffix}", flag_index)
       end
 
       flag_settings_hash_method
@@ -25,13 +27,6 @@ module BitmaskEnum
     end
 
     private
-
-    def fixes_from_options
-      prefix = @options[:flag_prefix] ? "#{@options[:flag_prefix]}_" : ''
-      suffix = @options[:flag_suffix] ? "_#{@options[:flag_suffix]}" : ''
-
-      [prefix, suffix]
-    end
 
     def per_flag_methods(flag_label, flag_index)
       flag_check_method(flag_label, flag_index)
@@ -44,23 +39,33 @@ module BitmaskEnum
     end
 
     def flag_check_method(flag_label, flag_index)
-      flag_method("#{flag_label}?", "(self['#{@attribute}'] & #{1 << flag_index}).positive?")
+      flag_method("#{flag_label}?", "(#{@nil_handler.in_attribute_eval(@attribute)} & #{1 << flag_index}).positive?")
     end
 
     def flag_toggle_method(flag_label, flag_index)
-      flag_method("#{flag_label}!", "update!('#{@attribute}' => self['#{@attribute}'] ^ #{1 << flag_index})")
+      flag_method(
+        "#{flag_label}!",
+        "update!('#{@attribute}' => #{@nil_handler.in_attribute_eval(@attribute)} ^ #{1 << flag_index})"
+      )
     end
 
     def flag_on_method(flag_label, flag_index)
-      flag_method("enable_#{flag_label}!", "update!('#{@attribute}' => self['#{@attribute}'] | #{1 << flag_index})")
+      flag_method(
+        "enable_#{flag_label}!",
+        "update!('#{@attribute}' => #{@nil_handler.in_attribute_eval(@attribute)} | #{1 << flag_index})"
+      )
     end
 
     def flag_off_method(flag_label, flag_index)
-      flag_method("disable_#{flag_label}!", "update!('#{@attribute}' => self['#{@attribute}'] & #{~(1 << flag_index)})")
+      flag_method(
+        "disable_#{flag_label}!",
+        "update!('#{@attribute}' => #{@nil_handler.in_attribute_eval(@attribute)} & #{~(1 << flag_index)})"
+      )
     end
 
     def flag_method(method_name, method_code)
       @conflict_checker.check_instance_method!(method_name)
+
       @model.class_eval %(
         def #{method_name}  # def flag!
           #{method_code}    #   update!('attribs' => self['attribs'] ^ 1)
@@ -80,6 +85,8 @@ module BitmaskEnum
       comparator = setting == :on ? :> : :==
       values_for_bitmask = (0...(1 << @flags.size)).select { |x| (x & (1 << flag_index)).send(comparator, 0) }
 
+      values_for_bitmask = @nil_handler.in_array(values_for_bitmask) if setting == :off
+
       @conflict_checker.check_class_method!(scope_name)
 
       @model.class_eval %(
@@ -91,9 +98,11 @@ module BitmaskEnum
 
     def flag_settings_hash_method
       method_name = "#{@attribute}_settings"
+
       @conflict_checker.check_instance_method!(method_name)
+
       flag_hash_contents = @flags.each_with_index.map do |flag, flag_index|
-        "#{flag}: (self['#{@attribute}'] & #{1 << flag_index}).positive?"
+        "#{flag}: (#{@nil_handler.in_attribute_eval(@attribute)} & #{1 << flag_index}).positive?"
       end.join(', ')
       @model.class_eval %(
         def #{method_name}          # def attribs_settings
@@ -104,8 +113,9 @@ module BitmaskEnum
 
     def enabled_flags_array_method
       @conflict_checker.check_instance_method!(@attribute)
+
       flag_array_contents = @flags.each_with_index.map do |flag, flag_index|
-        "(self['#{@attribute}'] & #{1 << flag_index}).positive? ? :#{flag} : nil"
+        "(#{@nil_handler.in_attribute_eval(@attribute)} & #{1 << flag_index}).positive? ? :#{flag} : nil"
       end.join(', ')
       @model.class_eval %(
         def #{@attribute}                   # def attribs
@@ -116,6 +126,7 @@ module BitmaskEnum
 
     def class_flag_values_method
       @conflict_checker.check_class_method!(@attribute)
+
       @model.class_eval %(
         def self.#{@attribute}  # def self.attribs
           #{@flags}             #   [:flag]

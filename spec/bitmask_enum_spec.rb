@@ -2,7 +2,7 @@
 
 RSpec.describe BitmaskEnum do
   it 'has a version number' do
-    expect(BitmaskEnum::VERSION).to eq '0.3.0'
+    expect(BitmaskEnum::VERSION).to eq '0.4.0'
   end
 
   context 'when the definition is valid' do
@@ -26,7 +26,7 @@ RSpec.describe BitmaskEnum do
 
       it 'initializes an attribute with the default options' do
         expect(described_class::Attribute).to have_received(:new).with(
-          Class, :attribs, [:flag], { flag_prefix: nil, flag_suffix: nil }, {}
+          Class, :attribs, [:flag], { flag_prefix: nil, flag_suffix: nil, nil_handling: :include }, {}
         )
       end
 
@@ -48,7 +48,7 @@ RSpec.describe BitmaskEnum do
 
       it 'constructs an attribute with the provided options with the defaults merged in' do
         expect(described_class::Attribute).to have_received(:new).with(
-          Class, :attribs, [:flag], { flag_prefix: 'type', flag_suffix: nil }, {}
+          Class, :attribs, [:flag], { flag_prefix: 'type', flag_suffix: nil, nil_handling: :include }, {}
         )
       end
 
