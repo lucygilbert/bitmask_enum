@@ -1,19 +1,21 @@
-RSpec.describe BitmaskEnum do
-  FLAGS = [:flag, :flag2, :flag3]
+# frozen_string_literal: true
 
-  after(:each) do
+FLAGS = %i[flag flag2 flag3].freeze
+
+class TestModel < ActiveRecord::Base
+  bitmask_enum attribs: FLAGS
+end
+
+RSpec.describe BitmaskEnum do
+  after do
     ActiveRecord::Base.connection.execute('DELETE FROM test_models')
   end
 
   it 'has a version number' do
-    expect(BitmaskEnum::VERSION).to eq '0.1.1'
+    expect(BitmaskEnum::VERSION).to eq '0.1.2'
   end
 
   context 'when the definition is valid' do
-    class TestModel < ActiveRecord::Base
-      bitmask_enum attribs: FLAGS
-    end
-
     def expect_other_flags_unchanged(method_name, flag, model)
       initial_values = current_flag_settings_excluding(flag, model)
 
@@ -34,31 +36,31 @@ RSpec.describe BitmaskEnum do
       '111'
     end
 
-    def all_enabled_but_one_attribs(i)
-      attribs = '111'
-      attribs[i] = '0'
-      attribs.reverse
+    def all_enabled_but_one_attribs(flag_index)
+      attribs = %w[1 1 1]
+      attribs[flag_index] = '0'
+      attribs.reverse.join
     end
 
-    def all_disabled_but_one_attribs(i)
-      attribs = '000'
-      attribs[i] = '1'
-      attribs.reverse
+    def all_disabled_but_one_attribs(flag_index)
+      attribs = %w[0 0 0]
+      attribs[flag_index] = '1'
+      attribs.reverse.join
     end
 
     def all_disabled_attribs
       '000'
     end
 
-    def one_set_others_mixed_attribs(i, enabled = true)
-      attribs = '000'
-      attribs[i] = enabled ? '1' : '0'
-      attribs[(i + 1) % FLAGS.size] = '1'
-      attribs[(i + 2) % FLAGS.size] = '0'
-      attribs.reverse
+    def one_set_others_mixed_attribs(flag_index, enabled: true)
+      attribs = %w[0 0 0]
+      attribs[flag_index] = enabled ? '1' : '0'
+      attribs[(flag_index + 1) % FLAGS.size] = '1'
+      attribs[(flag_index + 2) % FLAGS.size] = '0'
+      attribs.reverse.join
     end
 
-    FLAGS.each_with_index do |flag, i|
+    FLAGS.each_with_index do |flag, flag_index|
       describe "##{flag}?" do
         shared_examples 'checking the flag' do
           context 'when the flag is enabled' do
@@ -69,8 +71,7 @@ RSpec.describe BitmaskEnum do
             end
 
             it 'is idempotent' do
-              expect(model.public_send("#{flag}?")).to be true
-              expect(model.public_send("#{flag}?")).to be true
+              expect(3.times.map { model.public_send("#{flag}?") }).to eq [true, true, true]
             end
 
             it 'does not affect other flags' do
@@ -86,8 +87,7 @@ RSpec.describe BitmaskEnum do
             end
 
             it 'is idempotent' do
-              expect(model.public_send("#{flag}?")).to be false
-              expect(model.public_send("#{flag}?")).to be false
+              expect(3.times.map { model.public_send("#{flag}?") }).to eq [false, false, false]
             end
 
             it 'does not affect other flags' do
@@ -96,25 +96,24 @@ RSpec.describe BitmaskEnum do
           end
         end
 
-        
         context 'when all other flags are enabled' do
           it_behaves_like 'checking the flag' do
             let(:enabled_attribs) { all_enabled_attribs }
-            let(:disabled_attribs) { all_enabled_but_one_attribs(i) }
+            let(:disabled_attribs) { all_enabled_but_one_attribs(flag_index) }
           end
         end
 
         context 'when all other flags are disabled' do
           it_behaves_like 'checking the flag' do
-            let(:enabled_attribs) { all_disabled_but_one_attribs(i) }
+            let(:enabled_attribs) { all_disabled_but_one_attribs(flag_index) }
             let(:disabled_attribs) { all_disabled_attribs }
           end
         end
 
         context 'when other flags have a mix of settings' do
           it_behaves_like 'checking the flag' do
-            let(:enabled_attribs) { one_set_others_mixed_attribs(i) }
-            let(:disabled_attribs) { one_set_others_mixed_attribs(i, false) }
+            let(:enabled_attribs) { one_set_others_mixed_attribs(flag_index) }
+            let(:disabled_attribs) { one_set_others_mixed_attribs(flag_index, enabled: false) }
           end
         end
       end
@@ -153,21 +152,21 @@ RSpec.describe BitmaskEnum do
         context 'when all other flags are enabled' do
           it_behaves_like 'toggling the flag' do
             let(:enabled_attribs) { all_enabled_attribs }
-            let(:disabled_attribs) { all_enabled_but_one_attribs(i) }
+            let(:disabled_attribs) { all_enabled_but_one_attribs(flag_index) }
           end
         end
 
         context 'when all other flags are disabled' do
           it_behaves_like 'toggling the flag' do
-            let(:enabled_attribs) { all_disabled_but_one_attribs(i) }
+            let(:enabled_attribs) { all_disabled_but_one_attribs(flag_index) }
             let(:disabled_attribs) { all_disabled_attribs }
           end
         end
 
         context 'when other flags have a mix of settings' do
           it_behaves_like 'toggling the flag' do
-            let(:enabled_attribs) { one_set_others_mixed_attribs(i) }
-            let(:disabled_attribs) { one_set_others_mixed_attribs(i, false) }
+            let(:enabled_attribs) { one_set_others_mixed_attribs(flag_index) }
+            let(:disabled_attribs) { one_set_others_mixed_attribs(flag_index, enabled: false) }
           end
         end
       end
@@ -206,21 +205,21 @@ RSpec.describe BitmaskEnum do
         context 'when all other flags are enabled' do
           it_behaves_like 'enabling the flag' do
             let(:enabled_attribs) { all_enabled_attribs }
-            let(:disabled_attribs) { all_enabled_but_one_attribs(i) }
+            let(:disabled_attribs) { all_enabled_but_one_attribs(flag_index) }
           end
         end
 
         context 'when all other flags are disabled' do
           it_behaves_like 'enabling the flag' do
-            let(:enabled_attribs) { all_disabled_but_one_attribs(i) }
+            let(:enabled_attribs) { all_disabled_but_one_attribs(flag_index) }
             let(:disabled_attribs) { all_disabled_attribs }
           end
         end
 
         context 'when other flags have a mix of settings' do
           it_behaves_like 'enabling the flag' do
-            let(:enabled_attribs) { one_set_others_mixed_attribs(i) }
-            let(:disabled_attribs) { one_set_others_mixed_attribs(i, false) }
+            let(:enabled_attribs) { one_set_others_mixed_attribs(flag_index) }
+            let(:disabled_attribs) { one_set_others_mixed_attribs(flag_index, enabled: false) }
           end
         end
       end
@@ -259,34 +258,36 @@ RSpec.describe BitmaskEnum do
         context 'when all other flags are enabled' do
           it_behaves_like 'disabling the flag' do
             let(:enabled_attribs) { all_enabled_attribs }
-            let(:disabled_attribs) { all_enabled_but_one_attribs(i) }
+            let(:disabled_attribs) { all_enabled_but_one_attribs(flag_index) }
           end
         end
 
         context 'when all other flags are disabled' do
           it_behaves_like 'disabling the flag' do
-            let(:enabled_attribs) { all_disabled_but_one_attribs(i) }
+            let(:enabled_attribs) { all_disabled_but_one_attribs(flag_index) }
             let(:disabled_attribs) { all_disabled_attribs }
           end
         end
 
         context 'when other flags have a mix of settings' do
           it_behaves_like 'disabling the flag' do
-            let(:enabled_attribs) { one_set_others_mixed_attribs(i) }
-            let(:disabled_attribs) { one_set_others_mixed_attribs(i, false) }
+            let(:enabled_attribs) { one_set_others_mixed_attribs(flag_index) }
+            let(:disabled_attribs) { one_set_others_mixed_attribs(flag_index, enabled: false) }
           end
         end
       end
 
-      context 'scopes' do
+      describe 'scopes' do
         let(:models) do
           [
             TestModel.create!(attribs: all_enabled_attribs.to_i(2)),
-            TestModel.create!(attribs: all_enabled_but_one_attribs(i).to_i(2)),
-            TestModel.create!(attribs: all_disabled_but_one_attribs(i).to_i(2)),
+            TestModel.create!(attribs: all_enabled_but_one_attribs(flag_index).to_i(2)),
+            TestModel.create!(attribs: all_disabled_but_one_attribs(flag_index).to_i(2)),
             TestModel.create!(attribs: all_disabled_attribs.to_i(2)),
-            TestModel.create!(attribs: one_set_others_mixed_attribs(i).to_i(2)),
-            TestModel.create!(attribs: one_set_others_mixed_attribs(i, false).to_i(2))
+            TestModel.create!(attribs: one_set_others_mixed_attribs(flag_index).to_i(2)),
+            TestModel.create!(
+              attribs: one_set_others_mixed_attribs(flag_index, enabled: false).to_i(2)
+            )
           ]
         end
 
@@ -355,7 +356,7 @@ RSpec.describe BitmaskEnum do
         subject(:model) { TestModel.create!(attribs: all_enabled_attribs.to_i(2)) }
 
         it 'returns an array of all flags' do
-          expect(model.attribs).to eq [:flag, :flag2, :flag3]
+          expect(model.attribs).to eq %i[flag flag2 flag3]
         end
       end
 
@@ -371,7 +372,7 @@ RSpec.describe BitmaskEnum do
         subject(:model) { TestModel.create!(attribs: one_set_others_mixed_attribs(2).to_i(2)) }
 
         it 'returns an array of only the enabled flags' do
-          expect(model.attribs).to eq [:flag, :flag3]
+          expect(model.attribs).to eq %i[flag flag3]
         end
       end
     end
@@ -385,6 +386,9 @@ RSpec.describe BitmaskEnum do
 
   context 'when the definition is invalid' do
     context 'with a definition that is not a hash' do
+      let(:expected_error_type) { BitmaskEnum::BitmaskEnumInvalidError }
+      let(:expected_error_message) { 'BitmaskEnum definition is invalid: must be a hash' }
+
       it 'raises an error' do
         expect do
           Class.new(ActiveRecord::Base) do
@@ -394,14 +398,14 @@ RSpec.describe BitmaskEnum do
 
             bitmask_enum 'not_hash'
           end
-        end.to raise_error(
-          BitmaskEnum::BitmaskEnumInvalidError,
-          'BitmaskEnum definition is invalid: must be a hash'
-        )
+        end.to raise_error(expected_error_type, expected_error_message)
       end
     end
 
     context 'with a definition with multiple keys' do
+      let(:expected_error_type) { BitmaskEnum::BitmaskEnumInvalidError }
+      let(:expected_error_message) { 'BitmaskEnum definition is invalid: must have one key' }
+
       it 'raises an error' do
         expect do
           Class.new(ActiveRecord::Base) do
@@ -411,14 +415,16 @@ RSpec.describe BitmaskEnum do
 
             bitmask_enum attribs: [:flag_one], another: [:flag_two]
           end
-        end.to raise_error(
-          BitmaskEnum::BitmaskEnumInvalidError,
-          'BitmaskEnum definition is invalid: must have one key'
-        )
+        end.to raise_error(expected_error_type, expected_error_message)
       end
     end
 
     context 'with a definition whose first value is not an array of symbols or strings' do
+      let(:expected_error_type) { BitmaskEnum::BitmaskEnumInvalidError }
+      let(:expected_error_message) do
+        'BitmaskEnum definition is invalid: must provide a symbol or string array of flags'
+      end
+
       it 'raises an error' do
         expect do
           Class.new(ActiveRecord::Base) do
@@ -428,17 +434,21 @@ RSpec.describe BitmaskEnum do
 
             bitmask_enum attribs: { abc: 123 }
           end
-        end.to raise_error(
-          BitmaskEnum::BitmaskEnumInvalidError,
-          'BitmaskEnum definition is invalid: must provide a symbol or string array of flags'
-        )
+        end.to raise_error(expected_error_type, expected_error_message)
       end
     end
   end
 
   context 'when methods conflict' do
-    context 'at the class level' do
-      context 'when the method exists in ActiveRecord' do
+    context 'when at the class level' do
+      context 'with a method that exists in ActiveRecord' do
+        let(:expected_error_type) { BitmaskEnum::BitmaskEnumMethodConflictError }
+        let(:expected_error_message) do
+          'BitmaskEnum method definition is conflicting: ' \
+            'class method: create for enum: create in class: TestModel ' \
+            'is already defined by: ActiveRecord'
+        end
+
         it 'raises an error' do
           expect do
             Class.new(ActiveRecord::Base) do
@@ -448,16 +458,18 @@ RSpec.describe BitmaskEnum do
 
               bitmask_enum create: [:flag]
             end
-          end.to raise_error(
-            BitmaskEnum::BitmaskEnumMethodConflictError,
-            'BitmaskEnum method definition is conflicting: ' \
-            'class method: create for enum: create in class: TestModel ' \
-            'is already defined by: ActiveRecord'
-          )
+          end.to raise_error(expected_error_type, expected_error_message)
         end
       end
 
-      context 'when the method exists in ActiveRecord::Relation' do
+      context 'with a method that exists in ActiveRecord::Relation' do
+        let(:expected_error_type) { BitmaskEnum::BitmaskEnumMethodConflictError }
+        let(:expected_error_message) do
+          'BitmaskEnum method definition is conflicting: ' \
+            'class method: values for enum: values in class: TestModel ' \
+            'is already defined by: ActiveRecord::Relation'
+        end
+
         it 'raises an error' do
           expect do
             Class.new(ActiveRecord::Base) do
@@ -467,18 +479,20 @@ RSpec.describe BitmaskEnum do
 
               bitmask_enum values: [:flag]
             end
-          end.to raise_error(
-            BitmaskEnum::BitmaskEnumMethodConflictError,
-            'BitmaskEnum method definition is conflicting: ' \
-            'class method: values for enum: values in class: TestModel ' \
-            'is already defined by: ActiveRecord::Relation'
-          )
+          end.to raise_error(expected_error_type, expected_error_message)
         end
       end
     end
 
-    context 'at the instance level' do
-      context 'when the method exists in ActiveRecord' do
+    context 'when at the instance level' do
+      context 'with a method that exists in ActiveRecord' do
+        let(:expected_error_type) { BitmaskEnum::BitmaskEnumMethodConflictError }
+        let(:expected_error_message) do
+          'BitmaskEnum method definition is conflicting: ' \
+            'method: destroyed? for enum: attribs in class: TestModel ' \
+            'is already defined by: ActiveRecord'
+        end
+
         it 'raises an error' do
           expect do
             Class.new(ActiveRecord::Base) do
@@ -488,16 +502,18 @@ RSpec.describe BitmaskEnum do
 
               bitmask_enum attribs: [:destroyed]
             end
-          end.to raise_error(
-            BitmaskEnum::BitmaskEnumMethodConflictError,
-            'BitmaskEnum method definition is conflicting: ' \
-            'method: destroyed? for enum: attribs in class: TestModel ' \
-            'is already defined by: ActiveRecord'
-          )
+          end.to raise_error(expected_error_type, expected_error_message)
         end
       end
 
-      context 'when the method exists in another enum' do
+      context 'with a method that exists in another enum' do
+        let(:expected_error_type) { BitmaskEnum::BitmaskEnumMethodConflictError }
+        let(:expected_error_message) do
+          'BitmaskEnum method definition is conflicting: ' \
+            'method: flag? for enum: attribs in class: TestModel ' \
+            'is already defined by: other_int'
+        end
+
         it 'raises an error' do
           expect do
             Class.new(ActiveRecord::Base) do
@@ -508,12 +524,7 @@ RSpec.describe BitmaskEnum do
               bitmask_enum other_int: [:flag]
               bitmask_enum attribs: [:flag]
             end
-          end.to raise_error(
-            BitmaskEnum::BitmaskEnumMethodConflictError,
-            'BitmaskEnum method definition is conflicting: ' \
-            'method: flag? for enum: attribs in class: TestModel ' \
-            'is already defined by: other_int'
-          )
+          end.to raise_error(expected_error_type, expected_error_message)
         end
       end
     end

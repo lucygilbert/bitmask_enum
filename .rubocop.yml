@@ -5,3 +5,10 @@ AllCops:
   SuggestExtensions: false
   NewCops: enable
   TargetRubyVersion: 2.4
+
+Metrics/MethodLength: 
+  Max: 15
+RSpec/ExampleLength:
+  Max: 10
+RSpec/NestedGroups:
+  Max: 4
