@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
 module BitmaskEnum
+  # Handles nil attribute values
+  # @api private
   class NilHandler
     def initialize(handling_option)
       @handling_option = handling_option
     end
 
+    # Handles nil when evaling the attribute
+    # @param [String] Name of the attribute
+    # @return [String] Code string to handle a nil attribute according to the handling option
     def in_attribute_eval(attribute)
       select_handling(
         attribute,
@@ -13,6 +18,9 @@ module BitmaskEnum
       )
     end
 
+    # Handles nil for an array of values for the attribute
+    # @param [Array] Array of integers representing values of the attribute
+    # @return [Array] Array of integers representing values of the attribute, now corrected for nil values
     def in_array(array)
       select_handling(
         array,

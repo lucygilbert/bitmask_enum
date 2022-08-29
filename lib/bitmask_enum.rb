@@ -4,6 +4,7 @@ require 'active_record'
 require 'bitmask_enum/attribute'
 require 'bitmask_enum/errors'
 
+# Adds support for bitmask enum attributes to ActiveRecord models.
 module BitmaskEnum
   DEFAULT_BITMASK_ENUM_OPTIONS = {
     flag_prefix: nil,
@@ -11,6 +12,13 @@ module BitmaskEnum
     nil_handling: :include
   }.freeze
 
+  # Defines a bitmask enum and constructs the magic methods and method overrides for handling it.
+  # @param params [Hash] Hash with first key/value being the attribute name and an array of flags,
+  #   the remaining keys being options.
+  #   - `flag_prefix`: Symbol or string that prefixes all the created method names for flags joined with an underscore
+  #   - `flag_suffix`: Symbol or string that suffixes all the created method names for flags joined with an underscore
+  #   - `nil_handling`: Symbol or string signaling behaviour when handling nil attribute values. Options are:
+  #     - `include`: Treat nil as 0 and include in queries, this is the default.
   def bitmask_enum(params)
     validation_error = validate_params(params)
     raise BitmaskEnumInvalidError, validation_error if validation_error.present?

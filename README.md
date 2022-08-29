@@ -4,6 +4,8 @@ A bitmask enum attribute for ActiveRecord.
 
 Aiming to be lightweight and performant, providing the core functionality for the use of a bitmask enum model attribute.
 
+It adds checking, getting, setting and toggling of the flags to the instance; scopes for flags to the class; and allows creating/updating the attribute with a flag/an array of flags rather than an integer.
+
 Supporting Ruby 2.4+ and Rails 4.2+.
 
 Credit is due to Joel Moss' gem [bitmask_attributes](https://github.com/joelmoss/bitmask_attributes). I came across it while considering if I should write a gem for this. It's great work and some elements of it inspired this gem, I just had my own thoughts about how I'd like the gem to operate, and wanted some more end-to-end experience on gem production so I decided to create this rather than pick up the torch on that repo.
@@ -32,7 +34,13 @@ In the model, the bitmask enum is added in a similar way to enums. Given an inte
 bitmask_enum attribs: [:flag, :flag2], flag_prefix: 'type'
 ```
 
-The `bitmask_enum` class method is used to add the bitmask enum, which then goes on to add numerous helper methods to the model:
+The `bitmask_enum` class method is used to add the bitmask enum, which then goes on to add numerous helper methods to the model.
+
+It also enables setting the attribute with a flag or array of flags when creating or updating:
+```ruby
+Model.create!(attribs: :flag)
+Model.update!(attribs: [:flag, :flag2])
+```
 
 ### `bitmask_enum`
 
@@ -107,13 +115,23 @@ The method returns a hash with the flags as keys and their current settings as v
 
 **Return value:** `hash` - hash with flags as keys and their current settings as values. E.g. `{ flag_one: true, flag_two: false }`
 
-### `{attribute}`
+### `{attribute}` (_Override_)
 
 **No params**
 
 This method will be created once on the instance.
 
-The method returns an array of all enabled flags on the instance. The items will be symbols.
+The method returns an array of all enabled flags on the instance. The items will be symbols. This is the attribute getter.
+
+**Return value:** `array` - array of enabled flags. E.g. `[:flag_one, :flag_two]`
+
+### `{attribute}=` (_Override_)
+
+**No params**
+
+This method will be created once on the instance.
+
+The method set the attribute to the provided value - either an integer, a symbol or string representing a flag or an array of symbols or strings. This is the attribute setter.
 
 **Return value:** `array` - array of enabled flags. E.g. `[:flag_one, :flag_two]`
 

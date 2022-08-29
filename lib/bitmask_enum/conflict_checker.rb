@@ -3,6 +3,8 @@
 require 'bitmask_enum/errors'
 
 module BitmaskEnum
+  # Checks for method conflicts on the model
+  # @api private
   class ConflictChecker
     def initialize(model, attribute, defined_enum_methods)
       @model = model
@@ -10,6 +12,8 @@ module BitmaskEnum
       @defined_enum_methods = defined_enum_methods
     end
 
+    # Check if the method name is dangerous or already defined on the class
+    # @param method_name [String] Name of the method
     def check_class_method!(method_name)
       if @model.dangerous_class_method?(method_name)
         raise_bitmask_conflict_error!(ActiveRecord.name, method_name, klass_method: true)
@@ -18,6 +22,8 @@ module BitmaskEnum
       end
     end
 
+    # Check if the method name is dangerous or already defined on the instance, or defined by another bitmask enum
+    # @param method_name [String] Name of the method
     def check_instance_method!(method_name)
       if @model.dangerous_attribute_method?(method_name)
         raise_bitmask_conflict_error!(ActiveRecord.name, method_name)

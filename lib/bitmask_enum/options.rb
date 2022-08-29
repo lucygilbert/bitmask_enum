@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module BitmaskEnum
+  # Handles the bitmask enum's user-provided options
+  # @api private
   class Options
     attr_reader :flag_prefix, :flag_suffix, :nil_handling
 

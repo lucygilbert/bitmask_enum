@@ -6,6 +6,8 @@ require 'bitmask_enum/nil_handler'
 require 'bitmask_enum/eval_scripts'
 
 module BitmaskEnum
+  # Constructs the magic methods and overrides getters and setters for a bitmask enum attribute
+  # @api private
   class Attribute
     def initialize(model, attribute, flags, options, defined_enum_methods)
       @attribute = attribute
@@ -16,6 +18,7 @@ module BitmaskEnum
       @conflict_checker = ConflictChecker.new(model, attribute, defined_enum_methods)
     end
 
+    # Defines the methods for the attribute
     def construct!
       @flags.each_with_index do |flag, flag_index|
         per_flag_methods("#{@options.flag_prefix}#{flag}#{@options.flag_suffix}", flag_index)
