@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   raise 'RubyGems 2+ required to guard against public gem pushes' unless spec.respond_to?(:metadata)
 
-  spec.metadata['allowed_push_host'] = 'TODO: Set to http://mygemserver.com'
+  spec.metadata['allowed_push_host'] = 'https://rubygems.org/'
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = spec.homepage
   spec.metadata['changelog_uri'] = "#{spec.homepage}/blob/master/CHANGELOG.md"
@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.4'
 
-  spec.add_dependency 'activerecord', '>= 4.2'
+  spec.add_dependency 'activerecord', '>= 4.2', '<=7.0'
   spec.add_development_dependency 'bundler', '~> 1.17'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'

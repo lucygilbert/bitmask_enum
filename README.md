@@ -173,6 +173,15 @@ The method returns an array of all the defined flags. The items will be symbols.
 
 **Return value:** `array` - array of defined flags. E.g. `[:flag_one, :flag_two]`
 
+## Manual testing
+
+This gem has been tested and found to be generally functional with the following combinations: (but it should work with any combination of Ruby 2.4+ and Rails 4.2+, theoretically it could go lower but those are already 8 years old so I felt it was sufficient.)
+
+- Ruby 2.4.10 & Rails 4.2.11.3
+- Ruby 2.6.10 & Rails 4.2.11.3
+- Ruby 2.6.10 & Rails 5.2.8.1
+- Ruby 3.1.2 & Rails 7.0.3.1
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/lucygilbert/bitmask_enum. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.

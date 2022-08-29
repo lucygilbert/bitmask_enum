@@ -27,3 +27,13 @@ Pre-release.
 
 Add nil handling.
 Refactor options and add testing for them.
+
+## 1.0.0 : 2022-08-29
+
+Release.
+
+Add setter override to write flags as flag values.
+Add YARD docs.
+Standardize output to symbols.
+Add validation of the attribute - less_than: 1 << flags.size
+Add max ActiveRecord version to protect against future breaking releases
