@@ -22,7 +22,11 @@ RSpec.describe BitmaskEnum do
 
       it 'initializes an attribute with the default options' do
         expect(described_class::Attribute).to have_received(:new).with(
-          Class, :attribs, [:flag], { flag_prefix: nil, flag_suffix: nil, nil_handling: :include }, {}
+          Class,
+          :attribs,
+          [:flag],
+          { flag_prefix: nil, flag_suffix: nil, nil_handling: :include, validate: true },
+          {}
         )
       end
 
@@ -40,7 +44,11 @@ RSpec.describe BitmaskEnum do
 
       it 'constructs an attribute with the provided options with the defaults merged in' do
         expect(described_class::Attribute).to have_received(:new).with(
-          Class, :attribs, [:flag], { flag_prefix: 'type', flag_suffix: nil, nil_handling: :include }, {}
+          Class,
+          :attribs,
+          [:flag],
+          { flag_prefix: 'type', flag_suffix: nil, nil_handling: :include, validate: true },
+          {}
         )
       end
 

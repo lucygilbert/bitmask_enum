@@ -20,6 +20,8 @@ module BitmaskEnum
 
     # Defines the methods for the attribute
     def construct!
+      attribute_validation if @options.validate
+
       @flags.each_with_index do |flag, flag_index|
         per_flag_methods("#{@options.flag_prefix}#{flag}#{@options.flag_suffix}", flag_index)
       end
@@ -32,6 +34,10 @@ module BitmaskEnum
     end
 
     private
+
+    def attribute_validation
+      @model.class_eval EvalScripts.attribute_validation(@attribute, @flags.size), __FILE__, __LINE__
+    end
 
     def per_flag_methods(flag_label, flag_index)
       flag_check_method(flag_label, flag_index)

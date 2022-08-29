@@ -134,4 +134,56 @@ RSpec.describe BitmaskEnum::Options do
       end
     end
   end
+
+  context 'when validate is not set' do
+    after do
+      ActiveRecord::Base.connection.execute('DELETE FROM test_models')
+    end
+
+    context 'when using setting the attribute value above the maximum valid value' do
+      let(:instance) { TestModel.create!(attribs: [:flag2]) }
+
+      it 'raises an error' do
+        expect { instance.update!(attribs: (1 << FLAGS.size)) }.to raise_error(
+          ActiveRecord::RecordInvalid,
+          'Validation failed: Attribs must be less than 8'
+        )
+      end
+    end
+  end
+
+  context 'when validate is true' do
+    after do
+      ActiveRecord::Base.connection.execute('DELETE FROM validate_true_test_models')
+    end
+
+    context 'when using setting the attribute value above the maximum valid value' do
+      let(:instance) { ValidateTrueTestModel.create!(attribs: [:flag2]) }
+
+      it 'raises an error' do
+        expect { instance.update!(attribs: (1 << FLAGS.size)) }.to raise_error(
+          ActiveRecord::RecordInvalid,
+          'Validation failed: Attribs must be less than 8'
+        )
+      end
+    end
+  end
+
+  context 'when validate is false' do
+    after do
+      ActiveRecord::Base.connection.execute('DELETE FROM validate_false_test_models')
+    end
+
+    context 'when using setting the attribute value above the maximum valid value' do
+      let(:instance) { ValidateFalseTestModel.create!(attribs: [:flag2]) }
+
+      before do
+        instance.update!(attribs: (1 << FLAGS.size))
+      end
+
+      it 'sets the value' do
+        expect(ValidateFalseTestModel.first.attribs).to eq []
+      end
+    end
+  end
 end

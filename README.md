@@ -61,6 +61,7 @@ Any following keys are optional and should define options for the enum. The curr
   - The default value, used if the option is not supplied, is `:include`. This includes nil attribute rows as if they were 0.
   - There are currently no other options but more are planned.
   - Providing an unrecognized option will raise an error.
+- `validate` - A boolean signaling whether you want to apply attribute validation. Attributes will validate that they are less than the number of flags squared (number of flags squared - 1 is the highest valid bitmask value). Defaults to `true`.
 
 ---
 

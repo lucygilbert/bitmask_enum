@@ -29,6 +29,14 @@ ActiveRecord::Schema.define do
   create_table :include_nil_handler_test_models do |t|
     t.integer :attribs
   end
+
+  create_table :validate_true_test_models do |t|
+    t.integer :attribs
+  end
+
+  create_table :validate_false_test_models do |t|
+    t.integer :attribs
+  end
 end
 
 RSpec.configure do |config|
@@ -59,4 +67,12 @@ end
 
 class IncludeNilHandlerTestModel < ActiveRecord::Base
   bitmask_enum attribs: FLAGS, nil_handling: :include
+end
+
+class ValidateTrueTestModel < ActiveRecord::Base
+  bitmask_enum attribs: FLAGS, validate: true
+end
+
+class ValidateFalseTestModel < ActiveRecord::Base
+  bitmask_enum attribs: FLAGS, validate: false
 end

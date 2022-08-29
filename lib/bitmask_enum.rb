@@ -9,7 +9,8 @@ module BitmaskEnum
   DEFAULT_BITMASK_ENUM_OPTIONS = {
     flag_prefix: nil,
     flag_suffix: nil,
-    nil_handling: :include
+    nil_handling: :include,
+    validate: true
   }.freeze
 
   # Defines a bitmask enum and constructs the magic methods and method overrides for handling it.
@@ -19,6 +20,9 @@ module BitmaskEnum
   #   - `flag_suffix`: Symbol or string that suffixes all the created method names for flags joined with an underscore
   #   - `nil_handling`: Symbol or string signaling behaviour when handling nil attribute values. Options are:
   #     - `include`: Treat nil as 0 and include in queries, this is the default.
+  #   - `validate`: Boolean to apply attribute validation. Attributes will validate that they are
+  #     less than the number of flags squared (number of flags squared - 1 is the highest valid bitmask value).
+  #     Defaults to `true`.
   def bitmask_enum(params)
     validation_error = validate_params(params)
     raise BitmaskEnumInvalidError, validation_error if validation_error.present?

@@ -5,6 +5,19 @@ module BitmaskEnum
   # @api private
   module EvalScripts
     class << self
+      # Code for validation method checking attribute is within valid values
+      # @param attribute [String] Name of the attribute
+      # @param flags_size [Integer] Number of defined flags
+      # @return [String] Code string to be evaled
+      def attribute_validation(attribute, flags_size)
+        %(
+          validates(                                          # validates(
+            :#{attribute},                                    #   :attribs,
+            numericality: { less_than: (1 << #{flags_size}) } #   numericality: { less_than: (1 << 3) }
+          )                                                   # )
+        )
+      end
+
       # Code for methods checking and setting flags: `#flag?`, `#flag!`, `#enable_flag!`, `#disable_flag!`
       # @param method_name [String] Name of the method
       # @param method_code [String] Code contents of the method

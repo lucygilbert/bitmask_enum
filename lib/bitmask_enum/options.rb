@@ -6,7 +6,7 @@ module BitmaskEnum
   # Handles the bitmask enum's user-provided options
   # @api private
   class Options
-    attr_reader :flag_prefix, :flag_suffix, :nil_handling
+    attr_reader :flag_prefix, :flag_suffix, :nil_handling, :validate
 
     def initialize(options)
       @nil_handling = options[:nil_handling].to_sym
@@ -16,6 +16,7 @@ module BitmaskEnum
 
       @flag_prefix = options[:flag_prefix].nil? ? '' : "#{options[:flag_prefix]}_"
       @flag_suffix = options[:flag_suffix].nil? ? '' : "_#{options[:flag_suffix]}"
+      @validate = options[:validate]
     end
   end
 end
