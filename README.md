@@ -28,6 +28,8 @@ Or install it yourself as:
 
 ## Usage
 
+[RubyDocs for BitmaskEnum](https://www.rubydoc.info/github/lucygilbert/bitmask_enum/master)
+
 In the model, the bitmask enum is added in a similar way to enums. Given an integer attribute called `attribs`, flags of `flag` and `flag2`, adding the `flag_prefix` option with the value `type`, the following line would be used:
 
 ```ruby
