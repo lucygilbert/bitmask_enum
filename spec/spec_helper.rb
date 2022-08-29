@@ -14,6 +14,10 @@ ActiveRecord::Schema.define do
     t.integer :other_int
   end
 
+  create_table :string_flag_test_models do |t|
+    t.integer :attribs
+  end
+
   create_table :prefix_test_models do |t|
     t.integer :attribs
   end
@@ -39,6 +43,10 @@ FLAGS = %i[flag flag2 flag3].freeze
 
 class TestModel < ActiveRecord::Base
   bitmask_enum attribs: FLAGS
+end
+
+class StringFlagTestModel < ActiveRecord::Base
+  bitmask_enum attribs: FLAGS.map(&:to_s)
 end
 
 class PrefixTestModel < ActiveRecord::Base
