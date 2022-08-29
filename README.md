@@ -36,7 +36,7 @@ bitmask_enum attribs: [:flag, :flag2], flag_prefix: 'type'
 
 The `bitmask_enum` class method is used to add the bitmask enum, which then goes on to add numerous helper methods to the model.
 
-It also enables setting the attribute with a flag or array of flags when creating or updating:
+It also enables setting the attribute with a flag or array of flags when creating or updating. More info is in the `{attribute}=` method section.
 ```ruby
 Model.create!(attribs: :flag)
 Model.update!(attribs: [:flag, :flag2])
@@ -58,8 +58,9 @@ Any following keys are optional and should define options for the enum. The curr
 - `flag_suffix` - A symbol or string that will suffix all the created method names for individual flags
   - The gem will append the provided value to the flag with an underscore, e.g. `post` would become `flag_post`
 - `nil_handling` - A symbol or string that signifies which behaviour to use when handling nil attribute values
-  - The default value, used if the option is not supplied or if an unrecognized option is supplied, is :include. This includes nil attribute rows as if they were 0.
+  - The default value, used if the option is not supplied, is `:include`. This includes nil attribute rows as if they were 0.
   - There are currently no other options but more are planned.
+  - Providing an unrecognized option will raise an error.
 
 ---
 
@@ -131,7 +132,9 @@ The method returns an array of all enabled flags on the instance. The items will
 
 This method will be created once on the instance.
 
-The method set the attribute to the provided value - either an integer, a symbol or string representing a flag or an array of symbols or strings. This is the attribute setter.
+The method sets the attribute to the provided value - either an integer, a symbol or string representing a flag or an array of symbols or strings. This is the attribute setter.
+
+This method will raise an ArgumentError if one of the flag values passed is not one that was defined.
 
 **Return value:** `array` - array of enabled flags. E.g. `[:flag_one, :flag_two]`
 
@@ -165,7 +168,7 @@ The method is a scope of all records for which the flag is disabled.
 
 This method will be created once on the class.
 
-The method returns an array of all the defined flags. The items can be strings or symbols depending on which you used for the enum definition.
+The method returns an array of all the defined flags. The items will be symbols.
 
 **Return value:** `array` - array of defined flags. E.g. `[:flag_one, :flag_two]`
 

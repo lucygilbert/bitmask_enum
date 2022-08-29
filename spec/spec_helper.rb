@@ -22,7 +22,7 @@ ActiveRecord::Schema.define do
     t.integer :attribs
   end
 
-  create_table :unrecognized_nil_handler_test_models do |t|
+  create_table :include_nil_handler_test_models do |t|
     t.integer :attribs
   end
 end
@@ -49,6 +49,6 @@ class SuffixTestModel < ActiveRecord::Base
   bitmask_enum attribs: FLAGS, flag_suffix: 'post'
 end
 
-class UnrecognizedNilHandlerTestModel < ActiveRecord::Base
-  bitmask_enum attribs: FLAGS, nil_handling: :bork
+class IncludeNilHandlerTestModel < ActiveRecord::Base
+  bitmask_enum attribs: FLAGS, nil_handling: :include
 end

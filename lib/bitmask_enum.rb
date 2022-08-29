@@ -24,6 +24,7 @@ module BitmaskEnum
     raise BitmaskEnumInvalidError, validation_error if validation_error.present?
 
     attribute, flags = params.shift
+    flags = flags.map(&:to_sym)
     options = params
     merged_options = DEFAULT_BITMASK_ENUM_OPTIONS.merge(options.symbolize_keys)
 

@@ -20,7 +20,7 @@ module BitmaskEnum
       # Code for methods scoping by flag: `.flag_enabled`, `.flag_disabled`
       # @param scope_name [String] Name of the scope
       # @param attribute [String] Name of the attribute
-      # @param values_for_bitmask [Array] Array of integers for which the flag would be enabled or disabled
+      # @param values_for_bitmask [Array] Array of integers for which the flag would be disabled
       # @return [String] Code string to be evaled
       def flag_scope(scope_name, attribute, values_for_bitmask)
         %(
@@ -62,16 +62,22 @@ module BitmaskEnum
       # @return [String] The code string to be evaled
       def flag_setter(method_name, attribute)
         %(
-          def #{method_name}(value)                                  # def attribs=(value)
-            if value.is_a?(Integer)                                  #   if value.is_a?(Integer)
-              super                                                  #     super
-            else                                                     #   else
-              super(Array(value).reduce(0) do |acc, x|               #     super(Array(value).reduce(0) do |acc, x|
-                acc |                                                #       acc |
-                  (1 << (self.class.#{attribute}.index(x) || 0))     #         (1 << (self.class.attribs.index(x) || 0))
-              end)                                                   #     end)
-            end                                                      #   end
-          end                                                        # end
+def #{method_name}(value)                                     # def attribs=(value)
+  if value.is_a?(Integer)                                     #   if value.is_a?(Integer)
+    super                                                     #     super
+  else                                                        #   else
+    super(Array(value).reduce(0) do |acc, flag|               #     super(Array(value).reduce(0) do |acc, x|
+      flag_index = self.class.#{attribute}.index(flag.to_sym) #       flag_index = self.class.attribs.index(flag.to_sym)
+      if flag_index.nil?                                      #       if flag_index.nil?
+        raise(                                                #         raise(
+          ArgumentError,                                      #           ArgumentError,
+          "Invalid flag \#{flag} for #{attribute}"            #           "Invalid flag \#{flag} for attribs"
+        )                                                     #         )
+      end                                                     #       end
+      acc | (1 << flag_index)                                 #       acc | (1 << flag_index)
+    end)                                                      #     end)
+  end                                                         #   end
+end                                                           # end
         )
       end
 

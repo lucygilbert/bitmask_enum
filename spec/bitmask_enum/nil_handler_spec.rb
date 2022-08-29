@@ -109,17 +109,34 @@ RSpec.describe BitmaskEnum::NilHandler do
     end
   end
 
-  context 'with default :include nil handling' do
+  context 'with default nil handling' do
     it_behaves_like 'include or default nil handling' do
       let(:model) { TestModel }
       let(:table_name) { 'test_models' }
     end
   end
 
-  context 'with an unrecognized setting for nil handling' do
+  context 'with :include nil handling' do
     it_behaves_like 'include or default nil handling' do
-      let(:model) { UnrecognizedNilHandlerTestModel }
-      let(:table_name) { 'unrecognized_nil_handler_test_models' }
+      let(:model) { IncludeNilHandlerTestModel }
+      let(:table_name) { 'include_nil_handler_test_models' }
+    end
+  end
+
+  context 'with an unrecognized setting for nil handling' do
+    let(:expected_error_type) { BitmaskEnum::BitmaskEnumInvalidError }
+    let(:expected_error_message) { 'BitmaskEnum definition is invalid: bork is not a valid nil handling option' }
+
+    it 'raises an error' do
+      expect do
+        Class.new(ActiveRecord::Base) do
+          def self.name
+            'TestModel'
+          end
+
+          bitmask_enum attribs: [:flag], nil_handling: :bork
+        end
+      end.to raise_error(expected_error_type, expected_error_message)
     end
   end
 end
