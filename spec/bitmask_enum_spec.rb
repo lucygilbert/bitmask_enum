@@ -16,10 +16,6 @@ RSpec.describe BitmaskEnum do
     context 'with no options provided' do
       before do
         Class.new(ActiveRecord::Base) do
-          def self.name
-            'TestModel'
-          end
-
           bitmask_enum attribs: [:flag]
         end
       end
@@ -38,10 +34,6 @@ RSpec.describe BitmaskEnum do
     context 'with options provided' do
       before do
         Class.new(ActiveRecord::Base) do
-          def self.name
-            'TestModel'
-          end
-
           bitmask_enum attribs: [:flag], flag_prefix: 'type'
         end
       end
@@ -66,10 +58,6 @@ RSpec.describe BitmaskEnum do
       it 'raises an error' do
         expect do
           Class.new(ActiveRecord::Base) do
-            def self.name
-              'TestModel'
-            end
-
             bitmask_enum 'not_hash'
           end
         end.to raise_error(expected_error_type, expected_error_message)
@@ -85,10 +73,6 @@ RSpec.describe BitmaskEnum do
       it 'raises an error' do
         expect do
           Class.new(ActiveRecord::Base) do
-            def self.name
-              'TestModel'
-            end
-
             bitmask_enum({ 2 => [:flag] })
           end
         end.to raise_error(expected_error_type, expected_error_message)
@@ -104,10 +88,6 @@ RSpec.describe BitmaskEnum do
       it 'raises an error' do
         expect do
           Class.new(ActiveRecord::Base) do
-            def self.name
-              'TestModel'
-            end
-
             bitmask_enum({ '' => [:flag] })
           end
         end.to raise_error(expected_error_type, expected_error_message)
@@ -123,10 +103,6 @@ RSpec.describe BitmaskEnum do
       it 'raises an error' do
         expect do
           Class.new(ActiveRecord::Base) do
-            def self.name
-              'TestModel'
-            end
-
             bitmask_enum attribs: { abc: 123 }
           end
         end.to raise_error(expected_error_type, expected_error_message)
@@ -142,10 +118,6 @@ RSpec.describe BitmaskEnum do
       it 'raises an error' do
         expect do
           Class.new(ActiveRecord::Base) do
-            def self.name
-              'TestModel'
-            end
-
             bitmask_enum attribs: [2, 3]
           end
         end.to raise_error(expected_error_type, expected_error_message)

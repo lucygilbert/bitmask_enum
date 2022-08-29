@@ -130,10 +130,6 @@ RSpec.describe BitmaskEnum::NilHandler do
     it 'raises an error' do
       expect do
         Class.new(ActiveRecord::Base) do
-          def self.name
-            'TestModel'
-          end
-
           bitmask_enum attribs: [:flag], nil_handling: :bork
         end
       end.to raise_error(expected_error_type, expected_error_message)
