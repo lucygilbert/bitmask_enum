@@ -33,13 +33,40 @@ module BitmaskEnum
       # Code for methods scoping by flag: `.flag_enabled`, `.flag_disabled`
       # @param scope_name [String] Name of the scope
       # @param attribute [String] Name of the attribute
-      # @param values_for_bitmask [Array] Array of integers for which the flag would be disabled
+      # @param values_for_bitmask [Array] Array of integers for which the flag would be enabled/disabled
       # @return [String] Code string to be evaled
       def flag_scope(scope_name, attribute, values_for_bitmask)
         %(
           scope :#{scope_name}, -> do                       # scope :flag_disabled, -> do
             where('#{attribute}' => #{values_for_bitmask})  #   where('attribs' => [0, 2, 4])
           end                                               # end
+        )
+      end
+
+      # Code for methods dynamically scoping by flags: `.attribs_enabled`, `.attribs_disabled`
+      # @param scope_name [String] Name of the scope
+      # @param attribute [String] Name of the attribute
+      # @param flags_and_values [Array] Array of arrays, first being the flag, second being the enum values for the flag
+      # @param bitwise_operator [String] Bitwise operator used to combine the enum value arrays
+      # @return [String] Code string to be evaled
+      def dynamic_scope(scope_name, attribute, flags_and_values, bitwise_operator)
+        %(
+scope :#{scope_name}, ->(flags) do                             # scope :attribs_disabled, ->(flags) do
+  enum_values = {                                              #   enum_values = {
+    #{flags_and_values.map { |f, v| "#{f}: #{v}" }.join(', ')} #     flag: [1,3], flag2: [2]
+  }                                                            #   }
+                                                               #
+  where('#{attribute}' => Array(flags).map do |flag|           #   where('attribs' => Array(flags).map do |flag|
+    flag_values = enum_values[flag.to_sym]                     #     flag_values = enum_values[flag.to_sym]
+    if flag_values.nil?                                        #     if flag_index.nil?
+      raise(                                                   #       raise(
+        ArgumentError,                                         #         ArgumentError,
+        "Invalid flag \#{flag} for #{attribute}"               #         "Invalid flag \#{flag} for attribs"
+      )                                                        #       )
+    end                                                        #     end
+    flag_values                                                #     flag_values
+  end.reduce(&:#{bitwise_operator}))                           #   end.map(&:|))
+end                                                            # end
         )
       end
 

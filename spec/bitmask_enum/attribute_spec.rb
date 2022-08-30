@@ -341,6 +341,227 @@ RSpec.describe BitmaskEnum::Attribute do
       end
     end
 
+    describe 'dynamic scopes' do
+      shared_examples 'scopes correctly' do
+        it 'returns all records for the flags setting' do
+          expect(model.public_send(scope_name, flags)).to match_array(
+            expected_instances
+          )
+        end
+
+        it 'does not change any record' do
+          initial_values = model.pluck(:attribs)
+          model.public_send(scope_name, flags)
+          post_action_values = model.pluck(:attribs)
+
+          expect(post_action_values).to eq(initial_values)
+        end
+      end
+
+      let(:instances) do
+        [
+          model.create!(attribs: all_enabled_attribs.to_i(2)),
+          model.create!(attribs: all_enabled_but_one_attribs(1).to_i(2)),
+          model.create!(attribs: all_disabled_but_one_attribs(1).to_i(2)),
+          model.create!(attribs: all_disabled_attribs.to_i(2)),
+          model.create!(attribs: one_set_others_mixed_attribs(1).to_i(2)),
+          model.create!(attribs: one_set_others_mixed_attribs(1, enabled: false).to_i(2))
+        ]
+      end
+
+      describe '.any_attribs_enabled' do
+        let(:scope_name) { 'any_attribs_enabled' }
+
+        context 'with one symbol flag' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { :flag2 }
+            let(:expected_instances) { [instances[0], instances[2], instances[4]] }
+          end
+        end
+
+        context 'with multiple symbol flags' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { %i[flag2 flag3] }
+            let(:expected_instances) { [instances[0], instances[1], instances[2], instances[4], instances[5]] }
+          end
+        end
+
+        context 'with one string flag' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { 'flag2' }
+            let(:expected_instances) { [instances[0], instances[2], instances[4]] }
+          end
+        end
+
+        context 'with multiple string flags' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { %w[flag2 flag3] }
+            let(:expected_instances) { [instances[0], instances[1], instances[2], instances[4], instances[5]] }
+          end
+        end
+
+        context 'with an invalid symbol flag' do
+          it 'raises an error' do
+            expect { model.public_send(scope_name, :invalid) }.to raise_error(
+              ArgumentError, 'Invalid flag invalid for attribs'
+            )
+          end
+        end
+
+        context 'with an invalid string flag' do
+          it 'raises an error' do
+            expect { model.public_send(scope_name, 'invalid') }.to raise_error(
+              ArgumentError, 'Invalid flag invalid for attribs'
+            )
+          end
+        end
+      end
+
+      describe '.any_attribs_disabled' do
+        let(:scope_name) { 'any_attribs_disabled' }
+
+        context 'with one symbol flag' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { :flag2 }
+            let(:expected_instances) { [instances[1], instances[3], instances[5]] }
+          end
+        end
+
+        context 'with multiple symbol flags' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { %i[flag2 flag3] }
+            let(:expected_instances) { [instances[1], instances[2], instances[3], instances[5]] }
+          end
+        end
+
+        context 'with one string flag' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { 'flag2' }
+            let(:expected_instances) { [instances[1], instances[3], instances[5]] }
+          end
+        end
+
+        context 'with multiple string flags' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { %w[flag2 flag3] }
+            let(:expected_instances) { [instances[1], instances[2], instances[3], instances[5]] }
+          end
+        end
+
+        context 'with an invalid symbol flag' do
+          it 'raises an error' do
+            expect { model.public_send(scope_name, :invalid) }.to raise_error(
+              ArgumentError, 'Invalid flag invalid for attribs'
+            )
+          end
+        end
+
+        context 'with an invalid string flag' do
+          it 'raises an error' do
+            expect { model.public_send(scope_name, 'invalid') }.to raise_error(
+              ArgumentError, 'Invalid flag invalid for attribs'
+            )
+          end
+        end
+      end
+
+      describe '.all_attribs_enabled' do
+        let(:scope_name) { 'all_attribs_enabled' }
+
+        context 'with one symbol flag' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { :flag2 }
+            let(:expected_instances) { [instances[0], instances[2], instances[4]] }
+          end
+        end
+
+        context 'with multiple symbol flags' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { %i[flag2 flag3] }
+            let(:expected_instances) { [instances[0], instances[4]] }
+          end
+        end
+
+        context 'with one string flag' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { 'flag2' }
+            let(:expected_instances) { [instances[0], instances[2], instances[4]] }
+          end
+        end
+
+        context 'with multiple string flags' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { %w[flag2 flag3] }
+            let(:expected_instances) { [instances[0], instances[4]] }
+          end
+        end
+
+        context 'with an invalid symbol flag' do
+          it 'raises an error' do
+            expect { model.public_send(scope_name, :invalid) }.to raise_error(
+              ArgumentError, 'Invalid flag invalid for attribs'
+            )
+          end
+        end
+
+        context 'with an invalid string flag' do
+          it 'raises an error' do
+            expect { model.public_send(scope_name, 'invalid') }.to raise_error(
+              ArgumentError, 'Invalid flag invalid for attribs'
+            )
+          end
+        end
+      end
+
+      describe '.all_attribs_disabled' do
+        let(:scope_name) { 'all_attribs_disabled' }
+
+        context 'with one symbol flag' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { :flag2 }
+            let(:expected_instances) { [instances[1], instances[3], instances[5]] }
+          end
+        end
+
+        context 'with multiple symbol flags' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { %i[flag2 flag3] }
+            let(:expected_instances) { [instances[3]] }
+          end
+        end
+
+        context 'with one string flag' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { 'flag2' }
+            let(:expected_instances) { [instances[1], instances[3], instances[5]] }
+          end
+        end
+
+        context 'with multiple string flags' do
+          it_behaves_like 'scopes correctly' do
+            let(:flags) { %w[flag2 flag3] }
+            let(:expected_instances) { [instances[3]] }
+          end
+        end
+
+        context 'with an invalid symbol flag' do
+          it 'raises an error' do
+            expect { model.public_send(scope_name, :invalid) }.to raise_error(
+              ArgumentError, 'Invalid flag invalid for attribs'
+            )
+          end
+        end
+
+        context 'with an invalid string flag' do
+          it 'raises an error' do
+            expect { model.public_send(scope_name, 'invalid') }.to raise_error(
+              ArgumentError, 'Invalid flag invalid for attribs'
+            )
+          end
+        end
+      end
+    end
+
     describe '.attribs' do
       it 'returns all defined flags' do
         expect(model.attribs).to eq FLAGS

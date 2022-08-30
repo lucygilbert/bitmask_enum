@@ -133,7 +133,9 @@ The method returns an array of all enabled flags on the instance. The items will
 
 ### `{attribute}=` (_Override_)
 
-**No params**
+**Params**
+
+- value [Integer, Symbol, String, Array\<Symbol, String\>] - An integer, a defined flag or array of defined flags
 
 This method will be created once on the instance.
 
@@ -164,6 +166,54 @@ The method is a scope of all records for which the flag is enabled.
 For each flag, this method will be created on the class.
 
 The method is a scope of all records for which the flag is disabled.
+
+**Return value:** `ActiveRecord::Relation` - a collection of all records for which the flag is disabled.
+
+### `any_{attribute}_enabled`
+
+**Params**
+
+- flags [Symbol, String, Array\<Symbol, String\>] - A defined flag or array of defined flags
+
+This method will be created once on the class.
+
+The method is a scope of all records for which any of the provided flags are enabled.
+
+**Return value:** `ActiveRecord::Relation` - a collection of all records for which the flag is enabled.
+
+### `any_{attribute}_disabled`
+
+**Params**
+
+- flags [Symbol, String, Array\<Symbol, String\>] - A defined flag or array of defined flags
+
+This method will be created once on the class.
+
+The method is a scope of all records for which any of the provided flags are disabled.
+
+**Return value:** `ActiveRecord::Relation` - a collection of all records for which the flag is disabled.
+
+### `all_{attribute}_enabled`
+
+**Params**
+
+- flags [Symbol, String, Array\<Symbol, String\>] - A defined flag or array of defined flags
+
+This method will be created once on the class.
+
+The method is a scope of all records for which all of the provided flags are enabled.
+
+**Return value:** `ActiveRecord::Relation` - a collection of all records for which the flag is enabled.
+
+### `all_{attribute}_disabled`
+
+**Params**
+
+- flags [Symbol, String, Array\<Symbol, String\>] - A defined flag or array of defined flags
+
+This method will be created once on the class.
+
+The method is a scope of all records for which all of the provided flags are disabled.
 
 **Return value:** `ActiveRecord::Relation` - a collection of all records for which the flag is disabled.
 
