@@ -10,6 +10,8 @@ Supporting Ruby 2.4+ and Rails 4.2+.
 
 Credit is due to Joel Moss' gem [bitmask_attributes](https://github.com/joelmoss/bitmask_attributes). I came across it while considering if I should write a gem for this. It's great work and some elements of it inspired this gem, I just had my own thoughts about how I'd like the gem to operate, and wanted some more end-to-end experience on gem production so I decided to create this rather than pick up the torch on that repo.
 
+This gem attempts to improve performance by precomputing the integer values for the enum rather than using bitwise operations in the SQL.
+
 ## Installation
 
 Add this line to your application's Gemfile:
