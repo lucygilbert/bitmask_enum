@@ -9,13 +9,18 @@ on:
 jobs:
   rubocop:
     name: Lint with Rubocop
-    runs-on: ubuntu-latest
+    rruns-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Run Linter
-        uses: andrewmcodes/rubocop-linter-action@v3.3.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6.10
+      - name: Bundle Install
+        run: |
+          gem install bundler:1.17.2
+          bundle install
+      - name: Run Rubocop
+        run: bundle exec rubocop
   ruby24test:
     name: Test Ruby 2.4
     runs-on: ubuntu-latest
