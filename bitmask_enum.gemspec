@@ -3,7 +3,7 @@
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'bitmask_enum/version'
-p '$%$%$%$%$%', ENV['FORCED_BUNDLER_VERSION']
+
 Gem::Specification.new do |spec|
   spec.name          = 'bitmask_enum'
   spec.version       = BitmaskEnum::VERSION
@@ -35,5 +35,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rubocop', '~> 1.12'
   spec.add_development_dependency 'rubocop-rspec', '~> 2.2'
-  spec.add_development_dependency 'sqlite3', '~> 1.4'
 end
