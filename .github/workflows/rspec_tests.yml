@@ -31,10 +31,14 @@ jobs:
           ruby-version: 2.4.10
       - name: Remove Lock File
         run: rm Gemfile.lock
+      - name: Remove Lock File
+        run: rm Gemfile.lock
+      - name: Replace Gemfile
+        run: mv -f Gemfile.AR4 Gemfile
       - name: Bundle Install
         run: |
           gem install bundler:1.17.2
-          bundle install --gemfile Gemfile.AR4
+          bundle install
       - name: Run RSpec
         run: bundle exec rake spec
   ruby26test:
@@ -61,10 +65,12 @@ jobs:
           ruby-version: 3.1.2
       - name: Remove Lock File
         run: rm Gemfile.lock
+      - name: Replace Gemfile
+        run: mv -f Gemfile.AR7 Gemfile
       - name: Bundle Install
         run: |
           gem install bundler
-          bundle install --gemfile Gemfile.AR7
+          bundle install
         env:
           FORCED_BUNDLER_VERSION: 2.3.21
       - name: Run RSpec
