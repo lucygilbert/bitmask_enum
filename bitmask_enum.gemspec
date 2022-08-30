@@ -3,7 +3,7 @@
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'bitmask_enum/version'
-
+p '$%$%$%$%$%', ENV['FORCED_BUNDLER_VERSION']
 Gem::Specification.new do |spec|
   spec.name          = 'bitmask_enum'
   spec.version       = BitmaskEnum::VERSION
