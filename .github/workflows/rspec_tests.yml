@@ -47,8 +47,6 @@ jobs:
   ruby31test:
     name: Test Ruby 3.1
     runs-on: ubuntu-latest
-    env:
-      FORCED_BUNDLER_VERSION: 2.3.21
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
@@ -60,5 +58,9 @@ jobs:
         run: |
           gem install bundler
           bundle install --gemfile Gemfile.AR7
+        env:
+          FORCED_BUNDLER_VERSION: 2.3.21
       - name: Run RSpec
         run: bundle exec rake spec
+        env:
+          FORCED_BUNDLER_VERSION: 2.3.21
