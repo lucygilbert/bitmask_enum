@@ -30,6 +30,10 @@ module BitmaskEnum
       flag_getter_method
       flag_setter_method
 
+      dynamic_any_enabled_scope
+      dynamic_any_disabled_scope
+      dynamic_all_enabled_scope
+      dynamic_all_disabled_scope
       class_flag_values_method
     end
 
@@ -45,8 +49,8 @@ module BitmaskEnum
       flag_on_method(flag_label, flag_index)
       flag_off_method(flag_label, flag_index)
 
-      class_flag_enabled_scope(flag_label, flag_index)
-      class_flag_disabled_scope(flag_label, flag_index)
+      flag_enabled_scope(flag_label, flag_index)
+      flag_disabled_scope(flag_label, flag_index)
     end
 
     def flag_check_method(flag_label, flag_index)
@@ -80,23 +84,53 @@ module BitmaskEnum
       @model.class_eval EvalScripts.flag_method(method_name, method_code), __FILE__, __LINE__
     end
 
-    def class_flag_enabled_scope(flag_label, flag_index)
-      class_flag_scope("#{flag_label}_enabled", :on, flag_index)
+    def flag_enabled_scope(flag_label, flag_index)
+      flag_scope("#{flag_label}_enabled", :on, flag_index)
     end
 
-    def class_flag_disabled_scope(flag_label, flag_index)
-      class_flag_scope("#{flag_label}_disabled", :off, flag_index)
+    def flag_disabled_scope(flag_label, flag_index)
+      flag_scope("#{flag_label}_disabled", :off, flag_index)
     end
 
-    def class_flag_scope(scope_name, setting, flag_index)
-      comparator = setting == :on ? :> : :==
-      values_for_bitmask = (0...(1 << @flags.size)).select { |x| (x & (1 << flag_index)).send(comparator, 0) }
-
-      values_for_bitmask = @nil_handler.in_array(values_for_bitmask) if setting == :off
+    def flag_scope(scope_name, setting, flag_index)
+      values_for_bitmask = values_for_flag_bitmask(setting, flag_index)
 
       @conflict_checker.check_class_method!(scope_name)
 
       @model.class_eval EvalScripts.flag_scope(scope_name, @attribute, values_for_bitmask), __FILE__, __LINE__
+    end
+
+    def dynamic_any_enabled_scope
+      dynamic_scope("any_#{@attribute}_enabled", :on, '|')
+    end
+
+    def dynamic_any_disabled_scope
+      dynamic_scope("any_#{@attribute}_disabled", :off, '|')
+    end
+
+    def dynamic_all_enabled_scope
+      dynamic_scope("all_#{@attribute}_enabled", :on, '&')
+    end
+
+    def dynamic_all_disabled_scope
+      dynamic_scope("all_#{@attribute}_disabled", :off, '&')
+    end
+
+    def dynamic_scope(scope_name, setting, bitwise_operator)
+      flags_and_values = @flags.each_with_index.map do |flag, flag_index|
+        [flag, values_for_flag_bitmask(setting, flag_index)]
+      end
+
+      @model.class_eval EvalScripts.dynamic_scope(
+        scope_name, @attribute, flags_and_values, bitwise_operator
+      ), __FILE__, __LINE__ - 2
+    end
+
+    def values_for_flag_bitmask(setting, flag_index)
+      comparator = setting == :on ? :> : :==
+      values_for_bitmask = (0...(1 << @flags.size)).select { |x| (x & (1 << flag_index)).send(comparator, 0) }
+      values_for_bitmask = @nil_handler.in_array(values_for_bitmask) if setting == :off
+      values_for_bitmask
     end
 
     def flag_settings_hash_method

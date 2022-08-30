@@ -37,3 +37,9 @@ Add YARD docs.
 Standardize output to symbols.
 Add validation of the attribute - less_than: 1 << flags.size
 Add max ActiveRecord version to protect against future breaking releases
+
+# 1.1.0 : 2022-08-30
+
+Add dynamic scopes for any of provided flags enabled or disabled.
+Add dynamic scopes for all of provided flags enabled or disabled.
+Correct and update some documentation.
