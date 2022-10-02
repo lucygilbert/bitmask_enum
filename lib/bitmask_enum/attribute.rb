@@ -26,16 +26,8 @@ module BitmaskEnum
         per_flag_methods("#{@options.flag_prefix}#{flag}#{@options.flag_suffix}", flag_index)
       end
 
-      flag_settings_hash_method
-      flag_getter_method
-      flag_setter_method
-
-      no_flag_enabled_scope
-      dynamic_any_enabled_scope
-      dynamic_any_disabled_scope
-      dynamic_all_enabled_scope
-      dynamic_all_disabled_scope
-      class_flag_values_method
+      instance_level_methods
+      class_level_methods
     end
 
     private
@@ -101,6 +93,23 @@ module BitmaskEnum
       @model.class_eval EvalScripts.flag_scope(scope_name, @attribute, values_for_bitmask), __FILE__, __LINE__
     end
 
+    def instance_level_methods
+      flag_settings_hash_method
+      instance_any_flags_enabled_method
+      instance_any_flags_disabled_method
+      flag_getter_method
+      flag_setter_method
+    end
+
+    def class_level_methods
+      no_flag_enabled_scope
+      dynamic_any_enabled_scope
+      dynamic_any_disabled_scope
+      dynamic_all_enabled_scope
+      dynamic_all_disabled_scope
+      class_flag_values_method
+    end
+
     def no_flag_enabled_scope
       scope_name = "no_#{@attribute}_enabled"
       @conflict_checker.check_class_method!(scope_name)
@@ -139,6 +148,20 @@ module BitmaskEnum
       values_for_bitmask = (0...(1 << @flags.size)).select { |x| (x & (1 << flag_index)).send(comparator, 0) }
       values_for_bitmask = @nil_handler.in_array(values_for_bitmask) if setting == :off
       values_for_bitmask
+    end
+
+    def instance_any_flags_enabled_method
+      flag_test_method("any_#{@attribute}_enabled?", 'any?', true)
+    end
+
+    def instance_any_flags_disabled_method
+      flag_test_method("any_#{@attribute}_disabled?", 'any?', false)
+    end
+
+    def flag_test_method(method_name, test_method, boolean)
+      @conflict_checker.check_instance_method!(method_name)
+
+      @model.class_eval EvalScripts.flag_test_method(method_name, @attribute, test_method, boolean), __FILE__, __LINE__
     end
 
     def flag_settings_hash_method

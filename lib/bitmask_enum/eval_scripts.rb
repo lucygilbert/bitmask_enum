@@ -30,6 +30,31 @@ module BitmaskEnum
         )
       end
 
+      # Code for methods dynamically testing flags on a model: `#any_attribs_enabled?`, `#all_attribs_disabled?`
+      # The methods will take a symbol representing a flag or an array of symbols representing flags
+      # @param method_name [String] Name of the method
+      # @param attribute [String] Name of the attribute
+      # @param test_method [String] Name of the method used to test the provided flags against the model
+      # @param boolean [Boolean] Boolean to test flags against
+      # @return [String] Code string to be evaled
+      def flag_test_method(method_name, attribute, test_method, boolean)
+        bool_text = boolean == true ? 'true' : 'false'
+
+        %(
+          def #{method_name}(flags)                              # def any_attribs_enabled?(flags)
+            Array(flags).#{test_method} do |flag|                #   Array(flags).any? do |flag|
+              if self.class.#{attribute}.index(flag.to_sym).nil? #     if self.class.attribs.index(flag.to_sym).nil?
+                raise(                                           #       raise(
+                  ArgumentError,                                 #         ArgumentError,
+                  "Invalid flag \#{flag} for #{attribute}"       #         "Invalid flag \#{flag} for attribs"
+                )                                                #       )
+              end                                                #     end
+              #{attribute}_settings[flag.to_sym] == #{bool_text} #     attribs_settings[flag.to_sym] == true
+            end                                                  #   end
+          end                                                    # end
+        )
+      end
+
       # Code for methods scoping by flag: `.flag_enabled`, `.flag_disabled`
       # @param scope_name [String] Name of the scope
       # @param attribute [String] Name of the attribute
