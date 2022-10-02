@@ -310,7 +310,7 @@ RSpec.describe BitmaskEnum::Attribute do
         context 'when some flags not including the provided ones are enabled' do
           subject(:instance) { model.create!(attribs: all_disabled_but_one_attribs(1).to_i(2)) }
 
-          it 'returns true' do
+          it 'returns false' do
             expect(instance.any_attribs_enabled?(flags)).to be(false)
           end
         end
@@ -390,7 +390,7 @@ RSpec.describe BitmaskEnum::Attribute do
         context 'when some flags not including the provided ones are disabled' do
           subject(:instance) { model.create!(attribs: all_enabled_but_one_attribs(1).to_i(2)) }
 
-          it 'returns true' do
+          it 'returns false' do
             expect(instance.any_attribs_disabled?(flags)).to be(false)
           end
         end
@@ -398,7 +398,7 @@ RSpec.describe BitmaskEnum::Attribute do
         context 'when all flags are disabled' do
           subject(:instance) { model.create!(attribs: all_disabled_attribs.to_i(2)) }
 
-          it 'returns false' do
+          it 'returns true' do
             expect(instance.any_attribs_disabled?(flags)).to be(true)
           end
         end
