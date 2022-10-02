@@ -67,7 +67,7 @@ jobs:
         run: mv -f Gemfile.AR7 Gemfile
       - name: Bundle Install
         run: |
-          gem install bundler
+          gem install bundler:2.3.21
           bundle install
         env:
           FORCED_BUNDLER_VERSION: 2.3.21
