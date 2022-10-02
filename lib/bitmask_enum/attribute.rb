@@ -30,6 +30,7 @@ module BitmaskEnum
       flag_getter_method
       flag_setter_method
 
+      no_flag_enabled_scope
       dynamic_any_enabled_scope
       dynamic_any_disabled_scope
       dynamic_all_enabled_scope
@@ -98,6 +99,13 @@ module BitmaskEnum
       @conflict_checker.check_class_method!(scope_name)
 
       @model.class_eval EvalScripts.flag_scope(scope_name, @attribute, values_for_bitmask), __FILE__, __LINE__
+    end
+
+    def no_flag_enabled_scope
+      scope_name = "no_#{@attribute}_enabled"
+      @conflict_checker.check_class_method!(scope_name)
+
+      @model.class_eval EvalScripts.flag_scope(scope_name, @attribute, 0), __FILE__, __LINE__
     end
 
     def dynamic_any_enabled_scope

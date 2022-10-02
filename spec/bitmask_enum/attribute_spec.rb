@@ -341,6 +341,36 @@ RSpec.describe BitmaskEnum::Attribute do
       end
     end
 
+    describe '.no_attribs_enabled' do
+      let(:instances) do
+        [
+          model.create!(attribs: all_enabled_attribs.to_i(2)),
+          model.create!(attribs: all_enabled_but_one_attribs(1).to_i(2)),
+          model.create!(attribs: all_disabled_but_one_attribs(1).to_i(2)),
+          model.create!(attribs: all_disabled_attribs.to_i(2)),
+          model.create!(attribs: one_set_others_mixed_attribs(1).to_i(2)),
+          model.create!(attribs: one_set_others_mixed_attribs(1, enabled: false).to_i(2)),
+          model.create!(attribs: all_disabled_attribs.to_i(2))
+        ]
+      end
+
+      let(:expected_instances) { [instances[3], instances[6]] }
+
+      it 'returns all records with no flags set' do
+        expect(model.no_attribs_enabled).to match_array(
+          expected_instances
+        )
+      end
+
+      it 'does not change any record' do
+        initial_values = model.pluck(:attribs)
+        model.no_attribs_enabled
+        post_action_values = model.pluck(:attribs)
+
+        expect(post_action_values).to eq(initial_values)
+      end
+    end
+
     describe 'dynamic scopes' do
       shared_examples 'scopes correctly' do
         it 'returns all records for the flags setting' do

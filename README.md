@@ -169,6 +169,16 @@ The method is a scope of all records for which the flag is disabled.
 
 **Return value:** `ActiveRecord::Relation` - a collection of all records for which the flag is disabled.
 
+### `no_{attribute}_enabled`
+
+**No params**
+
+This method will be created once on the class.
+
+The method is a scope of all records for which no flags are enabled.
+
+**Return value:** `ActiveRecord::Relation` - a collection of all records for which no flags are enabled.
+
 ### `any_{attribute}_enabled`
 
 **Params**
