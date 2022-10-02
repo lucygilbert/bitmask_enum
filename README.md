@@ -111,6 +111,34 @@ The method disables the the flag is it is enabled, otherwise it takes no action.
 
 **Return value:** `boolean` - true if the update of the attribute was successful. Raises error if update was unsuccessful.
 
+### `any_{attribute}_enabled?`
+
+**Params**
+
+- flags [Symbol, String, Array\<Symbol, String\>] - A defined flag or array of defined flags
+
+This method will be created once on the instance.
+
+The method checks if any of the provided flags are enabled on the instance.
+
+This method will raise an ArgumentError if one of the flag values passed is not one that was defined.
+
+**Return value:** `boolean` - reflects whether any provided flag is enabled for the instance.
+
+### `any_{attribute}_disabled?`
+
+**Params**
+
+- flags [Symbol, String, Array\<Symbol, String\>] - A defined flag or array of defined flags
+
+This method will be created once on the instance.
+
+The method checks if any of the provided flags are disabled on the instance.
+
+This method will raise an ArgumentError if one of the flag values passed is not one that was defined.
+
+**Return value:** `boolean` - reflects whether any provided flag is disabled for the instance.
+
 ### `{attribute}_settings`
 
 **No params**
