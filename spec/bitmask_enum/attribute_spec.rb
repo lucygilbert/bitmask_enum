@@ -449,6 +449,198 @@ RSpec.describe BitmaskEnum::Attribute do
       end
     end
 
+    describe '#all_attribs_enabled?' do
+      shared_examples 'checks the flags correctly' do
+        context 'when all flags are enabled' do
+          subject(:instance) { model.create!(attribs: all_enabled_attribs.to_i(2)) }
+
+          it 'returns true' do
+            expect(instance.all_attribs_enabled?(flags)).to be(true)
+          end
+        end
+
+        context 'when some flags including all provided ones are enabled' do
+          subject(:instance) { model.create!(attribs: all_enabled_but_one_attribs(1).to_i(2)) }
+
+          it 'returns true' do
+            expect(instance.all_attribs_enabled?(flags)).to be(true)
+          end
+        end
+
+        context 'when some flags not including the provided ones are enabled' do
+          subject(:instance) { model.create!(attribs: all_disabled_but_one_attribs(1).to_i(2)) }
+
+          it 'returns false' do
+            expect(instance.all_attribs_enabled?(flags)).to be(false)
+          end
+        end
+
+        context 'when all flags are disabled' do
+          subject(:instance) { model.create!(attribs: all_disabled_attribs.to_i(2)) }
+
+          it 'returns false' do
+            expect(instance.all_attribs_enabled?(flags)).to be(false)
+          end
+        end
+      end
+
+      context 'with one string flag' do
+        it_behaves_like 'checks the flags correctly' do
+          let(:flags) { 'flag3' }
+        end
+      end
+
+      context 'with multiple string flags' do
+        it_behaves_like 'checks the flags correctly' do
+          let(:flags) { %w[flag flag3] }
+
+          context 'when some flags including some provided ones are enabled' do
+            subject(:instance) { model.create!(attribs: all_enabled_but_one_attribs(0).to_i(2)) }
+
+            it 'returns false' do
+              expect(instance.all_attribs_enabled?(flags)).to be(false)
+            end
+          end
+        end
+      end
+
+      context 'with one symbol flag' do
+        it_behaves_like 'checks the flags correctly' do
+          let(:flags) { :flag3 }
+        end
+      end
+
+      context 'with multiple symbol flags' do
+        it_behaves_like 'checks the flags correctly' do
+          let(:flags) { %i[flag flag3] }
+
+          context 'when some flags including some provided ones are enabled' do
+            subject(:instance) { model.create!(attribs: all_enabled_but_one_attribs(0).to_i(2)) }
+
+            it 'returns false' do
+              expect(instance.all_attribs_enabled?(flags)).to be(false)
+            end
+          end
+        end
+      end
+
+      context 'with an invalid symbol flag' do
+        subject(:instance) { model.create!(attribs: all_disabled_attribs.to_i(2)) }
+
+        it 'raises an error' do
+          expect { instance.all_attribs_enabled?(:invalid) }.to raise_error(
+            ArgumentError, 'Invalid flag invalid for attribs'
+          )
+        end
+      end
+
+      context 'with an invalid string flag' do
+        subject(:instance) { model.create!(attribs: all_disabled_attribs.to_i(2)) }
+
+        it 'raises an error' do
+          expect { instance.all_attribs_enabled?('invalid') }.to raise_error(
+            ArgumentError, 'Invalid flag invalid for attribs'
+          )
+        end
+      end
+    end
+
+    describe '#all_attribs_disabled?' do
+      shared_examples 'checks the flags correctly' do
+        context 'when all flags are enabled' do
+          subject(:instance) { model.create!(attribs: all_enabled_attribs.to_i(2)) }
+
+          it 'returns false' do
+            expect(instance.all_attribs_disabled?(flags)).to be(false)
+          end
+        end
+
+        context 'when some flags including all provided ones are disabled' do
+          subject(:instance) { model.create!(attribs: all_disabled_but_one_attribs(1).to_i(2)) }
+
+          it 'returns true' do
+            expect(instance.all_attribs_disabled?(flags)).to be(true)
+          end
+        end
+
+        context 'when some flags not including the provided ones are disabled' do
+          subject(:instance) { model.create!(attribs: all_enabled_but_one_attribs(1).to_i(2)) }
+
+          it 'returns false' do
+            expect(instance.all_attribs_disabled?(flags)).to be(false)
+          end
+        end
+
+        context 'when all flags are disabled' do
+          subject(:instance) { model.create!(attribs: all_disabled_attribs.to_i(2)) }
+
+          it 'returns true' do
+            expect(instance.all_attribs_disabled?(flags)).to be(true)
+          end
+        end
+      end
+
+      context 'with one string flag' do
+        it_behaves_like 'checks the flags correctly' do
+          let(:flags) { 'flag3' }
+        end
+      end
+
+      context 'with multiple string flags' do
+        it_behaves_like 'checks the flags correctly' do
+          let(:flags) { %w[flag flag3] }
+
+          context 'when some flags including some provided ones are disabled' do
+            subject(:instance) { model.create!(attribs: all_disabled_but_one_attribs(0).to_i(2)) }
+
+            it 'returns false' do
+              expect(instance.all_attribs_disabled?(flags)).to be(false)
+            end
+          end
+        end
+      end
+
+      context 'with one symbol flag' do
+        it_behaves_like 'checks the flags correctly' do
+          let(:flags) { :flag3 }
+        end
+      end
+
+      context 'with multiple symbol flags' do
+        it_behaves_like 'checks the flags correctly' do
+          let(:flags) { %i[flag flag3] }
+
+          context 'when some flags including some provided ones are disabled' do
+            subject(:instance) { model.create!(attribs: all_disabled_but_one_attribs(0).to_i(2)) }
+
+            it 'returns false' do
+              expect(instance.all_attribs_disabled?(flags)).to be(false)
+            end
+          end
+        end
+      end
+
+      context 'with an invalid symbol flag' do
+        subject(:instance) { model.create!(attribs: all_disabled_attribs.to_i(2)) }
+
+        it 'raises an error' do
+          expect { instance.all_attribs_disabled?(:invalid) }.to raise_error(
+            ArgumentError, 'Invalid flag invalid for attribs'
+          )
+        end
+      end
+
+      context 'with an invalid string flag' do
+        subject(:instance) { model.create!(attribs: all_disabled_attribs.to_i(2)) }
+
+        it 'raises an error' do
+          expect { instance.all_attribs_disabled?('invalid') }.to raise_error(
+            ArgumentError, 'Invalid flag invalid for attribs'
+          )
+        end
+      end
+    end
+
     describe '#attribs_settings' do
       context 'when all flags are enabled' do
         subject(:instance) { model.create!(attribs: all_enabled_attribs.to_i(2)) }

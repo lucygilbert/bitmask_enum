@@ -139,6 +139,34 @@ This method will raise an ArgumentError if one of the flag values passed is not 
 
 **Return value:** `boolean` - reflects whether any provided flag is disabled for the instance.
 
+### `all_{attribute}_enabled?`
+
+**Params**
+
+- flags [Symbol, String, Array\<Symbol, String\>] - A defined flag or array of defined flags
+
+This method will be created once on the instance.
+
+The method checks if all of the provided flags are enabled on the instance.
+
+This method will raise an ArgumentError if one of the flag values passed is not one that was defined.
+
+**Return value:** `boolean` - reflects whether all provided flags are enabled for the instance.
+
+### `all_{attribute}_disabled?`
+
+**Params**
+
+- flags [Symbol, String, Array\<Symbol, String\>] - A defined flag or array of defined flags
+
+This method will be created once on the instance.
+
+The method checks if all of the provided flags are disabled on the instance.
+
+This method will raise an ArgumentError if one of the flag values passed is not one that was defined.
+
+**Return value:** `boolean` - reflects whether all provided flags are disabled for the instance.
+
 ### `{attribute}_settings`
 
 **No params**

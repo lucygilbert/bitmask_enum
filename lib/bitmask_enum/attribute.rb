@@ -95,8 +95,7 @@ module BitmaskEnum
 
     def instance_level_methods
       flag_settings_hash_method
-      instance_any_flags_enabled_method
-      instance_any_flags_disabled_method
+      instance_flag_test_methods
       flag_getter_method
       flag_setter_method
     end
@@ -150,12 +149,11 @@ module BitmaskEnum
       values_for_bitmask
     end
 
-    def instance_any_flags_enabled_method
+    def instance_flag_test_methods
       flag_test_method("any_#{@attribute}_enabled?", 'any?', true)
-    end
-
-    def instance_any_flags_disabled_method
       flag_test_method("any_#{@attribute}_disabled?", 'any?', false)
+      flag_test_method("all_#{@attribute}_enabled?", 'all?', true)
+      flag_test_method("all_#{@attribute}_disabled?", 'all?', false)
     end
 
     def flag_test_method(method_name, test_method, boolean)
