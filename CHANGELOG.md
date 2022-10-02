@@ -43,3 +43,7 @@ Add max ActiveRecord version to protect against future breaking releases
 Add dynamic scopes for any of provided flags enabled or disabled.
 Add dynamic scopes for all of provided flags enabled or disabled.
 Correct and update some documentation.
+
+# 1.1.1 : 2022-08-30
+
+Dependencies changes for development concerns.
